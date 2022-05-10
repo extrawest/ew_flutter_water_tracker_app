@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider_starter_app/models/post.dart';
-import 'package:provider_starter_app/network/response.dart';
-import 'package:provider_starter_app/services/api_service.dart';
-import 'package:provider_starter_app/utils/logger.dart';
+import 'package:water_tracker/models/post.dart';
+import 'package:water_tracker/network/response.dart';
+import 'package:water_tracker/services/api_service.dart';
+import 'package:water_tracker/utils/logger.dart';
 
 class PostsViewModel extends ChangeNotifier {
   final ApiService _apiService;

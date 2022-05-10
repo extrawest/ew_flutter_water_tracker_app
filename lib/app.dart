@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:provider/provider.dart';
-import 'package:provider_starter_app/app_config.dart';
-import 'package:provider_starter_app/routes.dart';
-import 'package:provider_starter_app/view_models/theme_view_model.dart';
+import 'package:water_tracker/app_config.dart';
+import 'package:water_tracker/routes.dart';
+import 'package:water_tracker/view_models/theme_view_model.dart';
 
 import 'services/api_service.dart';
 import 'view_models/home_view_model.dart';
@@ -32,7 +32,7 @@ class _ApplicationState extends State<Application> {
         ],
         child: Consumer<ThemeViewModel>(builder: (context, themeViewModel, _) {
           return MaterialApp(
-            title: 'Flutter Provider Starter',
+            title: 'Water Tracker',
             theme: themeViewModel.getThemeData,
             initialRoute: splashScreenRoute,
             localizationsDelegates: [

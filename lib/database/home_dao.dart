@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:provider_starter_app/database/app_database.dart';
-import 'package:provider_starter_app/database/dao_api.dart';
-import 'package:provider_starter_app/models/item_model.dart';
 import 'package:sembast/sembast.dart';
+import 'package:water_tracker/database/app_database.dart';
+import 'package:water_tracker/database/dao_api.dart';
+import 'package:water_tracker/models/item_model.dart';
 
 typedef DatabaseSnapshotList = List<RecordSnapshot<int?, Map<String, dynamic>>>;
 

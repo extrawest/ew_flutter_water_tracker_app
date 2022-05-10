@@ -1,6 +1,6 @@
-import 'package:provider_starter_app/models/post.dart';
-import 'package:provider_starter_app/network/api_client.dart';
-import 'package:provider_starter_app/utils/logger.dart';
+import 'package:water_tracker/models/post.dart';
+import 'package:water_tracker/network/api_client.dart';
+import 'package:water_tracker/utils/logger.dart';
 
 const String postsPath = '/posts';
 

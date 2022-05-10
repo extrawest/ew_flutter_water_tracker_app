@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:provider/provider.dart';
-import 'package:provider_starter_app/common/app_bar_config.dart';
-import 'package:provider_starter_app/localization/keys.dart';
-import 'package:provider_starter_app/network/response.dart';
-import 'package:provider_starter_app/theme/theme.dart';
-import 'package:provider_starter_app/view_models/home_view_model.dart';
-import 'package:provider_starter_app/view_models/posts_view_model.dart';
-import 'package:provider_starter_app/view_models/theme_view_model.dart';
+import 'package:water_tracker/common/app_bar_config.dart';
+import 'package:water_tracker/localization/keys.dart';
+import 'package:water_tracker/network/response.dart';
+import 'package:water_tracker/theme/theme.dart';
+import 'package:water_tracker/view_models/home_view_model.dart';
+import 'package:water_tracker/view_models/posts_view_model.dart';
+import 'package:water_tracker/view_models/theme_view_model.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);

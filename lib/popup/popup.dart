@@ -1,8 +1,8 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:provider_starter_app/popup/popup_content.dart';
-import 'package:provider_starter_app/popup/popup_layout.dart';
+import 'package:water_tracker/popup/popup_content.dart';
+import 'package:water_tracker/popup/popup_layout.dart';
 
 void showDefault(BuildContext context, Widget widget, String title) {
   Navigator.push(

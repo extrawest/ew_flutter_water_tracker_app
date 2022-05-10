@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:provider_starter_app/app.dart';
-import 'package:provider_starter_app/app_config.dart';
-import 'package:provider_starter_app/localization/translate_preferences.dart';
+import 'package:water_tracker/app.dart';
+import 'package:water_tracker/app_config.dart';
+import 'package:water_tracker/localization/translate_preferences.dart';
 
 import 'utils/logger.dart';
 
@@ -13,7 +13,7 @@ Future<void> main() async {
   setupLogger();
 
   final configuredApp = AppConfig(
-    appName: 'Flutter Provider Application Starter',
+    appName: 'Water Tracker',
     flavorName: 'prod',
     apiUrl: 'prod.jsonplaceholder.typicode.com',
     child: Application(),

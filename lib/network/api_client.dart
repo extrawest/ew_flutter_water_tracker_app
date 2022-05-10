@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
-import 'package:provider_starter_app/network/exception.dart';
-import 'package:provider_starter_app/utils/logger.dart';
-import 'package:provider_starter_app/utils/secure_storage_utils.dart';
+import 'package:water_tracker/network/exception.dart';
+import 'package:water_tracker/utils/logger.dart';
+import 'package:water_tracker/utils/secure_storage_utils.dart';
 
 const String headerAccessToken = 'Authorization';
 

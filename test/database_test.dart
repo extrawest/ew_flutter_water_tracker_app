@@ -1,8 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:provider_starter_app/database/app_database.dart';
-import 'package:provider_starter_app/database/home_dao.dart';
-import 'package:provider_starter_app/models/item_model.dart';
+import 'package:water_tracker/database/app_database.dart';
+import 'package:water_tracker/database/home_dao.dart';
+import 'package:water_tracker/models/item_model.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

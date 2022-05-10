@@ -4,10 +4,10 @@ import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
-import 'package:provider_starter_app/app_config.dart';
-import 'package:provider_starter_app/popup/popup.dart';
-import 'package:provider_starter_app/theme/theme.dart';
-import 'package:provider_starter_app/utils/application_utils.dart';
+import 'package:water_tracker/app_config.dart';
+import 'package:water_tracker/popup/popup.dart';
+import 'package:water_tracker/theme/theme.dart';
+import 'package:water_tracker/utils/application_utils.dart';
 
 import 'utils/logger.dart';
 

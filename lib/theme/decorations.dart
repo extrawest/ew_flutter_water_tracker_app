@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider_starter_app/theme/theme.dart';
+import 'package:water_tracker/theme/theme.dart';
 
 List<BoxShadow> get commonShadow {
   return [

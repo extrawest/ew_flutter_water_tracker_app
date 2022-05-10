@@ -1,4 +1,4 @@
-package com.extrawest.provider_starter_app
+package com.extrawest.water_tracker
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity

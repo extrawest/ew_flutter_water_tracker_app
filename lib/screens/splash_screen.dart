@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:provider_starter_app/routes.dart';
+import 'package:water_tracker/routes.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
