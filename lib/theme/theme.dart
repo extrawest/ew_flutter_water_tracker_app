@@ -32,6 +32,7 @@ ThemeData darkTheme = ThemeData(
 
 ThemeData lightTheme = ThemeData(
   primaryColor: Colors.white,
+  scaffoldBackgroundColor: const Color(0xfff1f2f6),
   backgroundColor: greyShadeLight,
   colorScheme: const ColorScheme.light(primary: Colors.black54),
   floatingActionButtonTheme: const FloatingActionButtonThemeData(foregroundColor: Colors.white),
@@ -41,6 +42,7 @@ ThemeData lightTheme = ThemeData(
   textTheme: const TextTheme(
     headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
     headline6: TextStyle(fontSize: 22.0, fontStyle: FontStyle.italic),
+    bodyText1: TextStyle(color: Color(0xff274a6d)),
     bodyText2: TextStyle(fontSize: 14.0),
   ),
 );

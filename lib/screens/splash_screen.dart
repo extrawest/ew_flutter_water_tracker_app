@@ -13,7 +13,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     SchedulerBinding.instance!.addPostFrameCallback((timeStamp) async {
       Future.delayed(
-        const Duration(seconds: 2),
+        const Duration(seconds: 5),
         () => Navigator.pushReplacementNamed(context, homeScreenRoute),
       );
     });
@@ -21,9 +21,23 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Center(
-        child: Text('Splash Screen'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Text(
+              'Water Tracker',
+              style: TextStyle(
+                  fontSize: 28,
+                  color: Theme.of(context).textTheme.bodyText1?.color),
+            ),
+            SizedBox(
+              width: 100,
+              child: Image.asset('assets/images/drop.png'),
+            ),
+          ],
+        ),
       ),
     );
   }
