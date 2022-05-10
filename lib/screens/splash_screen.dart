@@ -14,7 +14,7 @@ class _SplashScreenState extends State<SplashScreen> {
     SchedulerBinding.instance!.addPostFrameCallback((timeStamp) async {
       Future.delayed(
         const Duration(seconds: 5),
-        () => Navigator.pushReplacementNamed(context, homeScreenRoute),
+        () => Navigator.pushReplacementNamed(context, loginScreenRoute),
       );
     });
   }
