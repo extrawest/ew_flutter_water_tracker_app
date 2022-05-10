@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>803272888282-42v8pjnav3j0mmaqie1ig9703sv9l2i5.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.803272888282-42v8pjnav3j0mmaqie1ig9703sv9l2i5</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBqofcoP8yHMdQWR-Dy3OatdJa2STLxY4k</string>
+	<key>GCM_SENDER_ID</key>
+	<string>803272888282</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.extrawest.waterTracker</string>
+	<key>PROJECT_ID</key>
+	<string>water-tracker-app-8936c</string>
+	<key>STORAGE_BUCKET</key>
+	<string>water-tracker-app-8936c.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:803272888282:ios:c10c2231ac895f77cabae3</string>
+</dict>
+</plist>
