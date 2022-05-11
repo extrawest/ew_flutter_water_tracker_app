@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:provider/provider.dart';
-import 'package:water_tracker/common/app_bar_config.dart';
 import 'package:water_tracker/localization/keys.dart';
 import 'package:water_tracker/network/response.dart';
+import 'package:water_tracker/routes.dart';
+import 'package:water_tracker/services/firebase/firebase_authentication.dart';
 import 'package:water_tracker/theme/theme.dart';
 import 'package:water_tracker/view_models/home_view_model.dart';
 import 'package:water_tracker/view_models/posts_view_model.dart';
@@ -23,7 +24,17 @@ class _HomeScreenState extends State<HomeScreen> {
     final postsProvider = context.watch<PostsViewModel>();
     final homeProvider = context.read<HomeViewModel>();
     return Scaffold(
-      appBar: defaultAppBar(context, translate(Keys.App_Bar_Title)),
+      appBar: AppBar(
+        title: const Text('Water Tracker'),
+        actions: [
+          IconButton(
+              onPressed: () {
+                AuthService().logOut();
+                Navigator.pushNamedAndRemoveUntil(context, loginScreenRoute, (route) => false);
+              },
+              icon: const Icon(Icons.logout))
+        ],
+      ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[

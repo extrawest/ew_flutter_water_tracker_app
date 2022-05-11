@@ -106,7 +106,6 @@ class _LoginScreenState extends State<LoginScreen> {
               child: IconButton(
                 icon: const Icon(
                   Icons.clear,
-                  //color: Colors.white,
                 ),
                 onPressed: () {
                   controller.text = '';
@@ -122,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
     User? user = await _authService.signInWithEmailAndPassword(
         emailController.text, passwordController.text);
     if(user != null){
-      Navigator.pushNamed(context, homeScreenRoute);
+      Navigator.pushReplacementNamed(context, homeScreenRoute);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(invalidAuthSnackBar);
     }

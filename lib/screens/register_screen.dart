@@ -147,7 +147,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         emailController.text, passwordController.text);
 
     if (user != null) {
-      Navigator.pushNamed(context, homeScreenRoute);
+      Navigator.pushReplacementNamed(context, homeScreenRoute);
     }
   }
 

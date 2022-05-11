@@ -1,6 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:water_tracker/routes.dart';
+
+import '../services/firebase/firebase_authentication.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -12,10 +16,11 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     SchedulerBinding.instance!.addPostFrameCallback((timeStamp) async {
-      Future.delayed(
-        const Duration(seconds: 5),
-        () => Navigator.pushReplacementNamed(context, loginScreenRoute),
-      );
+      await Firebase.initializeApp();
+      AuthService().firebaseAuth
+          .authStateChanges().listen((User? user) {
+        Navigator.pushReplacementNamed(context, user == null ? loginScreenRoute : homeScreenRoute);
+      });
     });
   }
 
