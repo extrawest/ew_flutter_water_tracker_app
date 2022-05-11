@@ -28,10 +28,14 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            const Text('Sign In'),
-            _form(),
+            const Expanded(
+                flex: 3,
+                child:
+                    Align(alignment: Alignment.center, child: Text('Sign In'))),
+            Expanded(flex: 4, child: _form()),
+            Text('Or Sign In with:'),
+            Expanded(flex: 2,child: Align(alignment: Alignment.topCenter,child: _otherAuth())),
           ],
         ),
       ),
@@ -43,8 +47,8 @@ class _LoginScreenState extends State<LoginScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 8.0),
-          child: _input(const Icon(Icons.account_circle_rounded), 'Enter your email',
-              emailController, false),
+          child: _input(const Icon(Icons.account_circle_rounded),
+              'Enter your email', emailController, false),
         ),
         Padding(
           padding: const EdgeInsets.only(bottom: 8.0),
@@ -55,8 +59,8 @@ class _LoginScreenState extends State<LoginScreen> {
           margin: const EdgeInsets.all(20),
           width: MediaQuery.of(context).size.width,
           child: TextButton(
-              onPressed: () {
-                _loginUser();
+              onPressed: () async {
+                await _loginUser();
               },
               style: TextButton.styleFrom(
                 padding: const EdgeInsets.all(20),
@@ -66,14 +70,14 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               child: const Text('Login')),
         ),
-        GestureDetector(
+        TextButton(
           child: Container(
             padding: const EdgeInsets.all(10),
             child: const Text(
               "Haven't an account yet? Register",
             ),
           ),
-          onTap: () {
+          onPressed: () {
             Navigator.pushNamed(context, registerScreenRoute);
           },
         )
@@ -99,7 +103,8 @@ class _LoginScreenState extends State<LoginScreen> {
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 10.0, right: 10.0),
               child: IconTheme(
-                  data: const IconThemeData(color: Color(0xff274a6d)), child: icon),
+                  data: const IconThemeData(color: Color(0xff274a6d)),
+                  child: icon),
             ),
             suffixIcon: Padding(
               padding: const EdgeInsets.only(right: 8.0),
@@ -117,13 +122,47 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  Widget _otherAuth() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        IconButton(
+            onPressed: () async {
+              await _loginWithGoogle();
+            },
+            icon: Image.asset('assets/images/google.png'),
+        ),
+        IconButton(
+          onPressed: () async {
+            await _loginWithFacebook();
+          },
+          icon: Image.asset('assets/images/facebook.png'),
+        ),
+      ],
+    );
+  }
+
   Future<void> _loginUser() async {
     User? user = await _authService.signInWithEmailAndPassword(
         emailController.text, passwordController.text);
-    if(user != null){
+    if (user != null) {
       Navigator.pushReplacementNamed(context, homeScreenRoute);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(invalidAuthSnackBar);
+    }
+  }
+
+  Future<void> _loginWithGoogle() async {
+    await _authService.signInWithGoogle();
+    if(_authService.firebaseAuth.currentUser != null) {
+      Navigator.pushReplacementNamed(context, homeScreenRoute);
+    }
+  }
+
+  Future<void> _loginWithFacebook() async {
+    await _authService.signInWithFacebook();
+    if(_authService.firebaseAuth.currentUser != null) {
+      Navigator.pushReplacementNamed(context, homeScreenRoute);
     }
   }
 }

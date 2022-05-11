@@ -37,6 +37,7 @@ dependencies:
   firebase_auth: ^3.3.17
   firebase_core: ^1.16.0
   google_sign_in: ^5.3.1
+  flutter_facebook_auth: ^4.3.4
 
 
 dev_dependencies:
@@ -61,6 +62,8 @@ flutter:
   assets:
     - assets/i18n/
     - assets/images/drop.png
+    - assets/images/google.png
+    - assets/images/facebook.png
 
   fonts:
     - family: SFUIDisplay

@@ -28,10 +28,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            const Text('Register'),
-            _form(),
+            const Expanded(
+                flex: 3,
+                child: Align(
+                    alignment: Alignment.center, child: Text('Register'))),
+            Expanded(flex: 5, child: _form()),
           ],
         ),
       ),
@@ -44,7 +46,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(bottom: 8.0, left: 20.0, right: 20.0),
             child: TextFormField(
               controller: emailController,
               style: const TextStyle(color: Color(0xff274a6d)),
@@ -56,7 +58,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(bottom: 8.0, left: 20.0, right: 20.0),
             child: TextFormField(
               controller: passwordController,
               style: const TextStyle(color: Color(0xff274a6d)),
@@ -70,7 +72,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(bottom: 8.0, left: 20.0, right: 20.0),
             child: TextFormField(
               controller: confirmPasswordController,
               style: const TextStyle(color: Color(0xff274a6d)),
@@ -97,14 +99,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 child: const Text('Register')),
           ),
-          GestureDetector(
+          TextButton(
             child: Container(
               padding: const EdgeInsets.all(10),
               child: const Text(
-                'Have an account yet? Sign In',
+                'Have an account already? Sign In',
               ),
             ),
-            onTap: () {
+            onPressed: () {
               Navigator.pop(context);
             },
           )
