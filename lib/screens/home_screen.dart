@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_translate/flutter_translate.dart';
-import 'package:provider/provider.dart';
-import 'package:water_tracker/localization/keys.dart';
-import 'package:water_tracker/network/response.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:water_tracker/bloc/auth_bloc/auth_bloc.dart';
+import 'package:water_tracker/bloc/auth_bloc/auth_bloc_event.dart';
+import 'package:water_tracker/bloc/auth_bloc/auth_bloc_state.dart';
 import 'package:water_tracker/routes.dart';
-import 'package:water_tracker/services/firebase/firebase_authentication.dart';
-import 'package:water_tracker/theme/theme.dart';
-import 'package:water_tracker/view_models/home_view_model.dart';
-import 'package:water_tracker/view_models/posts_view_model.dart';
-import 'package:water_tracker/view_models/theme_view_model.dart';
+
+import '../models/user_model.dart';
+import '../services/firebase/firestore.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -20,93 +18,130 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    /// We can listen to updates using the extensions:
-    final postsProvider = context.watch<PostsViewModel>();
-    final homeProvider = context.read<HomeViewModel>();
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Water Tracker'),
-        actions: [
-          IconButton(
-              onPressed: () {
-                AuthService().logOut();
-                Navigator.pushNamedAndRemoveUntil(context, loginScreenRoute, (route) => false);
-              },
-              icon: const Icon(Icons.logout))
-        ],
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-            _buildChangeLangButton(translate(Keys.Language_English), 'en'),
-            _buildChangeLangButton(translate(Keys.Language_Ukrainian), 'uk'),
-          ]),
-          _buildChangeThemeTile(),
-          ElevatedButton(
-            onPressed: () {
-              postsProvider.fetchPosts();
-            },
-            child: Text(translate(Keys.Fetch_Posts)),
+      body: BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if(state.status == AuthStatus.signedOut){
+            Navigator.pushNamedAndRemoveUntil(
+                context, loginScreenRoute, (route) => false);
+          }
+        },
+        child: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              _dateSelect(),
+              Expanded(flex: 4,child: _body()),
+              _bottomBar(),
+            ],
           ),
-          Text(
-            translatePlural(Keys.Plural_Demo, homeProvider.counter),
-            textAlign: TextAlign.center,
-            style: TextStyles.notifierTextLabel
-                .copyWith(color: Theme.of(context).colorScheme.secondary),
-          ),
-          Text(
-            _getText(postsProvider)!,
-            textAlign: TextAlign.center,
-            style: TextStyles.notifierTextLabel
-                .copyWith(color: Theme.of(context).colorScheme.secondary),
-          ),
-        ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => homeProvider.incrementCounter(),
+        onPressed: () async {
+          context.read<FirestoreDatabase>().addUser(UserModel(
+              id: 'k0D6uNEwcMTwEr6xdxMO',
+              email: 'email@dsa.da',
+              dailyWaterLimit: 2000));
+          context.read<FirestoreDatabase>().addWater(DayModel(
+              id: 'k0D6uNEwcMTwEr6xdxMO',
+              date: '',
+              water: [WaterModel(type: 'milk', amount: 200, time: '12:00')]));
+          final user = await context
+              .read<FirestoreDatabase>()
+              .getUser('k0D6uNEwcMTwEr6xdxMO');
+          print(user);
+        },
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  ListTile _buildChangeThemeTile() {
-    final themeViewModel = context.watch<ThemeViewModel>();
-    return ListTile(
-      leading: Text(
-        translate(Keys.Theme_Change_Theme),
-        style: Theme.of(context).textTheme.headline4,
+  Widget _dateSelect() {
+    return Container(
+      margin: const EdgeInsets.all(10.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
       ),
-      trailing: Switch(
-        value: themeViewModel.isLightTheme,
-        onChanged: (val) {
-          themeViewModel.setThemeData = val;
-        },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_drop_down),
+            onPressed: () {},
+          ),
+          Column(
+            children: const [
+              Text('Saturday'),
+              Text('7 September, 2019'),
+            ],
+          ),
+          Row(children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_left),
+              onPressed: () {},
+            ),
+            const VerticalDivider(),
+            IconButton(
+              icon: const Icon(Icons.arrow_right),
+              onPressed: () {},
+            ),
+          ]),
+        ],
       ),
     );
   }
 
-  ElevatedButton _buildChangeLangButton(String languageName, String languageCode) {
-    return ElevatedButton(
-      onPressed: () {
-        changeLocale(context, languageCode);
-      },
-      child: Text(languageName),
+  Widget _body() {
+    return Container(
+      margin: const EdgeInsets.all(10.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        children: [
+          ListTile(
+            title: const Text('Todays drinks:'),
+            trailing: IconButton(
+                onPressed: () {}, icon: const Icon(Icons.info_outlined)),
+          ),
+          ListView(
+            shrinkWrap: true,
+            children: const [
+              Text('drink'),
+              Text('drink'),
+              Text('drink'),
+            ],
+          )
+        ],
+      ),
     );
   }
 
-  String? _getText(PostsViewModel postsViewModel) {
-    final postsListResponse = postsViewModel.postsListResponse;
-    switch (postsListResponse.status) {
-      case Status.loading:
-        return postsListResponse.message;
-      case Status.completed:
-        return '${postsListResponse.data!.length}';
-      case Status.error:
-        return postsListResponse.message;
-      case Status.none:
-      default:
-        return '';
-    }
+  Widget _bottomBar() {
+    return Container(
+      margin: const EdgeInsets.all(10.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.stacked_bar_chart),
+            onPressed: () {
+              context.read<AuthBloc>().add(AuthLogOut());
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.account_circle_outlined),
+            onPressed: () {},
+          ),
+        ],
+      ),
+    );
   }
 }

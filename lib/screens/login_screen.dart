@@ -1,8 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:water_tracker/bloc/auth_bloc/auth_bloc.dart';
+import 'package:water_tracker/bloc/auth_bloc/auth_bloc_event.dart';
+import 'package:water_tracker/bloc/auth_bloc/auth_bloc_state.dart';
 import 'package:water_tracker/routes.dart';
-
-import '../services/firebase/firebase_authentication.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -16,8 +17,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final TextEditingController passwordController = TextEditingController();
 
-  final _authService = AuthService();
-
   final invalidAuthSnackBar = const SnackBar(
     content: Text('Invalid email or password'),
     duration: Duration(seconds: 5),
@@ -26,17 +25,29 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          children: [
-            const Expanded(
-                flex: 3,
-                child:
-                    Align(alignment: Alignment.center, child: Text('Sign In'))),
-            Expanded(flex: 4, child: _form()),
-            Text('Or Sign In with:'),
-            Expanded(flex: 2,child: Align(alignment: Alignment.topCenter,child: _otherAuth())),
-          ],
+      body: BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if(state.status == AuthStatus.signedIn){
+            Navigator.pushReplacementNamed(context, homeScreenRoute);
+          } else if(state.status == AuthStatus.failure) {
+            ScaffoldMessenger.of(context).showSnackBar(invalidAuthSnackBar);
+          }
+        },
+        child: Center(
+          child: Column(
+            children: [
+              const Expanded(
+                  flex: 3,
+                  child:
+                      Align(alignment: Alignment.center, child: Text('Sign In'))),
+              Expanded(flex: 4, child: _form()),
+              Text('Or Sign In with:'),
+              Expanded(
+                  flex: 2,
+                  child:
+                      Align(alignment: Alignment.topCenter, child: _otherAuth())),
+            ],
+          ),
         ),
       ),
     );
@@ -59,8 +70,8 @@ class _LoginScreenState extends State<LoginScreen> {
           margin: const EdgeInsets.all(20),
           width: MediaQuery.of(context).size.width,
           child: TextButton(
-              onPressed: () async {
-                await _loginUser();
+              onPressed: () {
+                _loginUser();
               },
               style: TextButton.styleFrom(
                 padding: const EdgeInsets.all(20),
@@ -127,14 +138,14 @@ class _LoginScreenState extends State<LoginScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         IconButton(
-            onPressed: () async {
-              await _loginWithGoogle();
-            },
-            icon: Image.asset('assets/images/google.png'),
+          onPressed: () {
+            _loginWithGoogle();
+          },
+          icon: Image.asset('assets/images/google.png'),
         ),
         IconButton(
-          onPressed: () async {
-            await _loginWithFacebook();
+          onPressed: () {
+            _loginWithFacebook();
           },
           icon: Image.asset('assets/images/facebook.png'),
         ),
@@ -142,27 +153,16 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Future<void> _loginUser() async {
-    User? user = await _authService.signInWithEmailAndPassword(
-        emailController.text, passwordController.text);
-    if (user != null) {
-      Navigator.pushReplacementNamed(context, homeScreenRoute);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(invalidAuthSnackBar);
-    }
+  void _loginUser() {
+    context.read<AuthBloc>().add(AuthSignIn(
+        email: emailController.text, password: passwordController.text));
   }
 
-  Future<void> _loginWithGoogle() async {
-    await _authService.signInWithGoogle();
-    if(_authService.firebaseAuth.currentUser != null) {
-      Navigator.pushReplacementNamed(context, homeScreenRoute);
-    }
+  void _loginWithGoogle() {
+    context.read<AuthBloc>().add(AuthSignInGoogle());
   }
 
-  Future<void> _loginWithFacebook() async {
-    await _authService.signInWithFacebook();
-    if(_authService.firebaseAuth.currentUser != null) {
-      Navigator.pushReplacementNamed(context, homeScreenRoute);
-    }
+  void _loginWithFacebook() {
+    context.read<AuthBloc>().add(AuthSignInFacebook());
   }
 }

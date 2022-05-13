@@ -6,11 +6,16 @@ class FirestoreDatabase {
   DocumentReference? userDoc;
 
   Future<void> addUser(UserModel model) async {
-    userDoc = _db.collection('users').doc(model.id);
+    /// We need to check if user has already existed in firestore
+    /// in cases when we use Google or Facebook Authentication
+    if((await _db.collection('users').doc(model.id).get()).exists) {
+      return;
+    }
     await _db
         .collection('users')
         .doc(model.id)
         .set(model.toJson());
+    userDoc = _db.collection('users').doc(model.id);
   }
 
   Future<UserModel> getUser(String id) async {

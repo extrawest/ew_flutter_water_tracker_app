@@ -1,8 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:water_tracker/bloc/auth_bloc/auth_bloc_event.dart';
+import 'package:water_tracker/bloc/auth_bloc/auth_bloc_state.dart';
 
+import '../bloc/auth_bloc/auth_bloc.dart';
 import '../routes.dart';
-import '../services/firebase/firebase_authentication.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -19,22 +21,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
-  final _authService = AuthService();
-
   final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          children: [
-            const Expanded(
-                flex: 3,
-                child: Align(
-                    alignment: Alignment.center, child: Text('Register'))),
-            Expanded(flex: 5, child: _form()),
-          ],
+      body: BlocListener<AuthBloc, AuthState>(
+        listener: (BuildContext context, state) {
+          if(state.status == AuthStatus.signedIn){
+            Navigator.pushReplacementNamed(context, homeScreenRoute);
+          }
+        },
+        child: Center(
+          child: Column(
+            children: [
+              const Expanded(
+                  flex: 3,
+                  child: Align(
+                      alignment: Alignment.center, child: Text('Register'))),
+              Expanded(flex: 5, child: _form()),
+            ],
+          ),
         ),
       ),
     );
@@ -46,7 +53,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(bottom: 8.0, left: 20.0, right: 20.0),
+            padding:
+                const EdgeInsets.only(bottom: 8.0, left: 20.0, right: 20.0),
             child: TextFormField(
               controller: emailController,
               style: const TextStyle(color: Color(0xff274a6d)),
@@ -58,7 +66,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 8.0, left: 20.0, right: 20.0),
+            padding:
+                const EdgeInsets.only(bottom: 8.0, left: 20.0, right: 20.0),
             child: TextFormField(
               controller: passwordController,
               style: const TextStyle(color: Color(0xff274a6d)),
@@ -72,7 +81,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 8.0, left: 20.0, right: 20.0),
+            padding:
+                const EdgeInsets.only(bottom: 8.0, left: 20.0, right: 20.0),
             child: TextFormField(
               controller: confirmPasswordController,
               style: const TextStyle(color: Color(0xff274a6d)),
@@ -144,13 +154,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ));
   }
 
-  Future<void> _registerUser() async {
-    User? user = await _authService.registerWithEmailAndPassword(
-        emailController.text, passwordController.text);
-
-    if (user != null) {
-      Navigator.pushReplacementNamed(context, homeScreenRoute);
-    }
+  void _registerUser() {
+    context.read<AuthBloc>().add(AuthRegister(
+        email: emailController.text, password: passwordController.text));
   }
 
   String? _validatePassword(String? value) {

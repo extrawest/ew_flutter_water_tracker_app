@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:water_tracker/routes.dart';
@@ -16,7 +15,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     SchedulerBinding.instance!.addPostFrameCallback((timeStamp) async {
-      await Firebase.initializeApp();
+
       AuthService().firebaseAuth
           .authStateChanges().listen((User? user) {
         Navigator.pushReplacementNamed(context, user == null ? loginScreenRoute : homeScreenRoute);
