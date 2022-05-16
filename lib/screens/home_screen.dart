@@ -3,8 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:water_tracker/bloc/auth_bloc/auth_bloc.dart';
 import 'package:water_tracker/bloc/auth_bloc/auth_bloc_event.dart';
 import 'package:water_tracker/bloc/auth_bloc/auth_bloc_state.dart';
+import 'package:water_tracker/bloc/date_picker_bloc/date_picker_event.dart';
 import 'package:water_tracker/routes.dart';
 
+import '../bloc/date_picker_bloc/date_picker_bloc.dart';
+import '../bloc/date_picker_bloc/date_picker_state.dart';
 import '../models/user_model.dart';
 import '../services/firebase/firestore.dart';
 
@@ -16,12 +19,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final _datePickerBloc = DatePickerBloc()..add(DatePickerSelectDate(DateTime.now()));
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
-          if(state.status == AuthStatus.signedOut){
+          if (state.status == AuthStatus.signedOut) {
             Navigator.pushNamedAndRemoveUntil(
                 context, loginScreenRoute, (route) => false);
           }
@@ -31,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               _dateSelect(),
-              Expanded(flex: 4,child: _body()),
+              Expanded(flex: 4, child: _body()),
               _bottomBar(),
             ],
           ),
@@ -58,39 +63,52 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _dateSelect() {
-    return Container(
-      margin: const EdgeInsets.all(10.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_drop_down),
-            onPressed: () {},
-          ),
-          Column(
-            children: const [
-              Text('Saturday'),
-              Text('7 September, 2019'),
-            ],
-          ),
-          Row(children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_left),
-              onPressed: () {},
+    return BlocBuilder<DatePickerBloc, DatePickerState>(
+        bloc: _datePickerBloc,
+        builder: (context, state) {
+          return Container(
+            margin: const EdgeInsets.all(10.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
             ),
-            const VerticalDivider(),
-            IconButton(
-              icon: const Icon(Icons.arrow_right),
-              onPressed: () {},
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_drop_down),
+                  onPressed: () {
+                    showDatePicker(
+                      context: context,
+                      initialDate: state.date ?? DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2100),
+                    ).then((date) {
+                      _datePickerBloc.add(DatePickerSelectDate(date!));
+                    });
+                  },
+                ),
+                Column(
+                  children: [
+                    Text(state.dayOfWeek),
+                    Text(state.dateInfo),
+                  ],
+                ),
+                Row(children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_left),
+                    onPressed: () {},
+                  ),
+                  const VerticalDivider(),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_right),
+                    onPressed: () {},
+                  ),
+                ]),
+              ],
             ),
-          ]),
-        ],
-      ),
-    );
+          );
+        });
   }
 
   Widget _body() {
