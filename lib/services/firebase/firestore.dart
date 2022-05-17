@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:water_tracker/models/user_model.dart';
 
 class FirestoreDatabase {
   final _db = FirebaseFirestore.instance;
+  final uid = FirebaseAuth.instance.currentUser!.uid;
   DocumentReference? userDoc;
 
   Future<void> addUser(UserModel model) async {
@@ -35,5 +37,10 @@ class FirestoreDatabase {
 
     await _daysCollection.doc(date)
         .set({'water': FieldValue.arrayUnion([waterModel.toJson()])}, SetOptions(merge: true));
+  }
+
+  Stream<DocumentSnapshot> getDayDoc(String date) {
+    final dayDocRef = _db.collection('users').doc(uid).collection('days').doc(date);
+    return dayDocRef.snapshots();
   }
 }

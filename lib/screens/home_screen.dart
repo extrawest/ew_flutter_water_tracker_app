@@ -1,31 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:water_tracker/bloc/auth_bloc/auth_bloc.dart';
 import 'package:water_tracker/bloc/auth_bloc/auth_bloc_event.dart';
 import 'package:water_tracker/bloc/auth_bloc/auth_bloc_state.dart';
 import 'package:water_tracker/bloc/date_picker_bloc/date_picker_event.dart';
+import 'package:water_tracker/bloc/drinks_bloc/drinks_bloc.dart';
+import 'package:water_tracker/bloc/drinks_bloc/drinks_event.dart';
+import 'package:water_tracker/repository/firestore_repository.dart';
 import 'package:water_tracker/routes.dart';
 
 import '../bloc/date_picker_bloc/date_picker_bloc.dart';
 import '../bloc/date_picker_bloc/date_picker_state.dart';
 import '../models/user_model.dart';
 import '../services/firebase/firestore.dart';
-
-// class SetHomeScreen extends StatelessWidget {
-//   const SetHomeScreen({Key? key}) : super(key: key);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return MultiBlocProvider(
-//         providers: [
-//
-//         ],
-//         child: const HomeScreen());
-//   }
-// }
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -36,7 +24,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final _datePickerBloc = DatePickerBloc()
-    ..add(DatePickerSelectDate(DateTime.parse(DateTime.now().toString().split(' ')[0])));
+    ..add(DatePickerSelectDate(
+        DateTime.parse(DateTime.now().toString().split(' ')[0])));
+  final _drinksBloc = DrinksBloc(FirestoreRepositoryImpl(FirestoreDatabase()));
 
   @override
   Widget build(BuildContext context) {
@@ -61,16 +51,12 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // FirestoreDatabase().addUser(UserModel(
-          //     id: 'k0D6uNEwcMTwEr6xdxMO',
-          //     email: 'email@dsa.da',
-          //     dailyWaterLimit: 2000));
-          FirestoreDatabase().addWater(
-              WaterModel(type: 'milk', amount: 250, time: '13:50'),
-              '${_datePickerBloc.state.date?.microsecondsSinceEpoch}');
-          // final user = await context
-          //     .read<FirestoreDatabase>()
-          //     .getUser('k0D6uNEwcMTwEr6xdxMO');
+          _drinksBloc.add(AddDrink(
+              time: '13:50',
+              date:
+                  _datePickerBloc.state.date!.microsecondsSinceEpoch.toString(),
+              type: 'tea',
+              amount: 200));
         },
         child: const Icon(Icons.add),
       ),
@@ -95,7 +81,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () {
                     showDatePicker(
                       context: context,
-                      initialDate: state.date ?? DateTime.parse(DateTime.now().toString().split(' ')[0]),
+                      initialDate: state.date ??
+                          DateTime.parse(
+                              DateTime.now().toString().split(' ')[0]),
                       firstDate: DateTime(2000),
                       lastDate: DateTime(2100),
                     ).then((date) {
@@ -143,12 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () {}, icon: const Icon(Icons.info_outlined)),
             ),
             StreamBuilder<DocumentSnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('users')
-                    .doc(FirebaseAuth.instance.currentUser!.uid)
-                    .collection('days')
-                    .doc('${state.date?.microsecondsSinceEpoch}')
-                    .snapshots(),
+                stream: FirestoreDatabase().getDayDoc('${state.date?.microsecondsSinceEpoch}'),//FirebaseFirestore.instance
                 builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
                   if (snapshot.data!.data() == null) {
                     return const Text('No drinks added today');
@@ -164,7 +147,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               (water) => Column(
                                 children: [
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Column(
                                         children: [

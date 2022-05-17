@@ -4,7 +4,7 @@ import 'package:water_tracker/services/firebase/firestore.dart';
 abstract class FirestoreRepository {
   Future<void> addUser(UserModel model);
 
-  Future<void> addWater(WaterModel waterModel);
+  Future<void> addWater(WaterModel waterModel, String date);
 
   Future<UserModel> getUser(String id);
 }
@@ -20,8 +20,8 @@ class FirestoreRepositoryImpl implements FirestoreRepository {
   }
 
   @override
-  Future<void> addWater(WaterModel waterModel) async {
-    await _firestoreDatabase.addWater(waterModel, '');
+  Future<void> addWater(WaterModel waterModel, String date) async {
+    await _firestoreDatabase.addWater(waterModel, date);
   }
 
   @override
