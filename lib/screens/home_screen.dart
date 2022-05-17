@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:water_tracker/bloc/auth_bloc/auth_bloc.dart';
@@ -11,6 +13,20 @@ import '../bloc/date_picker_bloc/date_picker_state.dart';
 import '../models/user_model.dart';
 import '../services/firebase/firestore.dart';
 
+// class SetHomeScreen extends StatelessWidget {
+//   const SetHomeScreen({Key? key}) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return MultiBlocProvider(
+//         providers: [
+//
+//         ],
+//         child: const HomeScreen());
+//   }
+// }
+
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -19,7 +35,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _datePickerBloc = DatePickerBloc()..add(DatePickerSelectDate(DateTime.now()));
+  final _datePickerBloc = DatePickerBloc()
+    ..add(DatePickerSelectDate(DateTime.parse(DateTime.now().toString().split(' ')[0])));
 
   @override
   Widget build(BuildContext context) {
@@ -44,18 +61,16 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          context.read<FirestoreDatabase>().addUser(UserModel(
-              id: 'k0D6uNEwcMTwEr6xdxMO',
-              email: 'email@dsa.da',
-              dailyWaterLimit: 2000));
-          context.read<FirestoreDatabase>().addWater(DayModel(
-              id: 'k0D6uNEwcMTwEr6xdxMO',
-              date: '',
-              water: [WaterModel(type: 'milk', amount: 200, time: '12:00')]));
-          final user = await context
-              .read<FirestoreDatabase>()
-              .getUser('k0D6uNEwcMTwEr6xdxMO');
-          print(user);
+          // FirestoreDatabase().addUser(UserModel(
+          //     id: 'k0D6uNEwcMTwEr6xdxMO',
+          //     email: 'email@dsa.da',
+          //     dailyWaterLimit: 2000));
+          FirestoreDatabase().addWater(
+              WaterModel(type: 'milk', amount: 250, time: '13:50'),
+              '${_datePickerBloc.state.date?.microsecondsSinceEpoch}');
+          // final user = await context
+          //     .read<FirestoreDatabase>()
+          //     .getUser('k0D6uNEwcMTwEr6xdxMO');
         },
         child: const Icon(Icons.add),
       ),
@@ -80,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () {
                     showDatePicker(
                       context: context,
-                      initialDate: state.date ?? DateTime.now(),
+                      initialDate: state.date ?? DateTime.parse(DateTime.now().toString().split(' ')[0]),
                       firstDate: DateTime(2000),
                       lastDate: DateTime(2100),
                     ).then((date) {
@@ -112,28 +127,65 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _body() {
-    return Container(
-      margin: const EdgeInsets.all(10.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        children: [
-          ListTile(
-            title: const Text('Todays drinks:'),
-            trailing: IconButton(
-                onPressed: () {}, icon: const Icon(Icons.info_outlined)),
-          ),
-          ListView(
-            shrinkWrap: true,
-            children: const [
-              Text('drink'),
-              Text('drink'),
-              Text('drink'),
-            ],
-          )
-        ],
+    return BlocBuilder<DatePickerBloc, DatePickerState>(
+      bloc: _datePickerBloc,
+      builder: (context, state) => Container(
+        margin: const EdgeInsets.all(10.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          children: [
+            ListTile(
+              title: const Text("Today's drinks:"),
+              trailing: IconButton(
+                  onPressed: () {}, icon: const Icon(Icons.info_outlined)),
+            ),
+            StreamBuilder<DocumentSnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .collection('days')
+                    .doc('${state.date?.microsecondsSinceEpoch}')
+                    .snapshots(),
+                builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                  if (snapshot.data!.data() == null) {
+                    return const Text('No drinks added today');
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.all(14.0),
+                    child: ListView(
+                        shrinkWrap: true,
+                        children: DayModel.fromJson(
+                                snapshot.data!.data() as Map<String, dynamic>)
+                            .water!
+                            .map(
+                              (water) => Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        children: [
+                                          Text(water.type),
+                                          Text(water.time),
+                                        ],
+                                      ),
+                                      Text('${water.amount}ml'),
+                                    ],
+                                  ),
+                                  const Divider(
+                                    color: Colors.black12,
+                                  ),
+                                ],
+                              ),
+                            )
+                            .toList()),
+                  );
+                }),
+          ],
+        ),
       ),
     );
   }

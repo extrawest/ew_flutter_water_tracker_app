@@ -27,13 +27,13 @@ class FirestoreDatabase {
     return UserModel.fromJson(documentSnapshot.data() as Map<String, dynamic>);
   }
 
-  Future<void> addWater(DayModel dayModel) async {
+  Future<void> addWater(WaterModel waterModel, String date) async {
     final CollectionReference _daysCollection = _db
         .collection('users')
-        .doc(userDoc!.id)
+        .doc('LhH5JTB7j8QBdXBQ1KlZWHDcNCz1')
         .collection('days');
 
-    await _daysCollection.doc(dayModel.id)
-        .set(dayModel.toJson());
+    await _daysCollection.doc(date)
+        .set({'water': FieldValue.arrayUnion([waterModel.toJson()])}, SetOptions(merge: true));
   }
 }
