@@ -32,7 +32,7 @@ class FirestoreDatabase {
   Future<void> addWater(WaterModel waterModel, String date) async {
     final CollectionReference _daysCollection = _db
         .collection('users')
-        .doc('LhH5JTB7j8QBdXBQ1KlZWHDcNCz1')
+        .doc(uid)
         .collection('days');
 
     await _daysCollection.doc(date)

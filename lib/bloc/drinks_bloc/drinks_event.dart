@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:water_tracker/models/user_model.dart';
 
@@ -17,6 +18,12 @@ class AddDrink extends DrinksEvent {
       required this.date,
       required this.type,
       required this.amount});
+}
+
+class LoadDrinks extends DrinksEvent {
+  final DocumentSnapshot snapshot;
+
+  LoadDrinks(this.snapshot);
 }
 
 class DeleteDrink extends DrinksEvent {

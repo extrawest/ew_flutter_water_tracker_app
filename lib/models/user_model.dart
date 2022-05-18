@@ -17,16 +17,13 @@ class UserModel {
       'email': email,
       'photoId': photoId,
       'daily_water_limit': dailyWaterLimit,
-      //'days': days == null ? null : days!.map((day) => day.toJson()),
     };
   }
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
         email: json['email'],
-        dailyWaterLimit: json['daily_water_limit'],
-        days: json['days'] != null ? List<DayModel>.from(
-            json['days'].map((day) => DayModel.fromJson(day))) : null);
+        dailyWaterLimit: json['daily_water_limit'],);
   }
 }
 

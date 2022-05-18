@@ -9,6 +9,7 @@ class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
 
   DrinksBloc(this.repository) : super(const DrinkState()) {
     on<AddDrink>(_onAddDrink);
+    on<LoadDrinks>(_onLoadDrinks);
   }
 
   Future<void> _onAddDrink(AddDrink event, Emitter<DrinkState> emit) async {
@@ -20,5 +21,10 @@ class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
     } catch (err) {
       emit(state.copyWith(status: DrinkStatus.failure, error: err.toString()));
     }
+  }
+
+  void _onLoadDrinks(LoadDrinks event, Emitter<DrinkState> emit) {
+    final DayModel dayModel = DayModel.fromJson(event.snapshot.data() as Map<String, dynamic>);
+    emit(state.copyWith(drinks: dayModel.water));
   }
 }
