@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:water_tracker/models/user_model.dart';
+import 'package:water_tracker/models/water_model.dart';
 
 class FirestoreDatabase {
   final _db = FirebaseFirestore.instance;

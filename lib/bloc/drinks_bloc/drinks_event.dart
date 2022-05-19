@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
-import 'package:water_tracker/models/user_model.dart';
+import 'package:water_tracker/models/water_model.dart';
 
 abstract class DrinksEvent extends Equatable {
   @override

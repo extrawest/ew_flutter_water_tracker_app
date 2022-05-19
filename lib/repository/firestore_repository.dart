@@ -1,4 +1,5 @@
 import 'package:water_tracker/models/user_model.dart';
+import 'package:water_tracker/models/water_model.dart';
 import 'package:water_tracker/services/firebase/firestore.dart';
 
 abstract class FirestoreRepository {
