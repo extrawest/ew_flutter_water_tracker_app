@@ -3,7 +3,8 @@ class WaterModel {
   String type;
   String time;
 
-  WaterModel({required this.amount, required this.time, required this.type});
+  WaterModel(
+      {required this.amount, required this.time, required this.type});
 
   Map<String, dynamic> toJson() {
     return {

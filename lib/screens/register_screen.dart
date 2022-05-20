@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:water_tracker/bloc/auth_bloc/auth_bloc_event.dart';
-import 'package:water_tracker/bloc/auth_bloc/auth_bloc_state.dart';
-
-import '../bloc/auth_bloc/auth_bloc.dart';
+import 'package:water_tracker/bloc/auth_bloc/auth_bloc_barrel.dart';
 import '../routes.dart';
 
 class RegisterScreen extends StatefulWidget {

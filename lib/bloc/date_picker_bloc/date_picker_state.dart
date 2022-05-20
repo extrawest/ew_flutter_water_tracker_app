@@ -9,7 +9,7 @@ class DatePickerState extends Equatable {
   const DatePickerState(
       {this.dayOfWeek = '',
       this.dateInfo = '',
-      this.date,});
+      this.date});
 
   DatePickerState copyWith(
           {String? dayOfWeek,

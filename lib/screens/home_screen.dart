@@ -1,21 +1,36 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:water_tracker/bloc/auth_bloc/auth_bloc.dart';
-import 'package:water_tracker/bloc/auth_bloc/auth_bloc_event.dart';
-import 'package:water_tracker/bloc/auth_bloc/auth_bloc_state.dart';
-import 'package:water_tracker/bloc/date_picker_bloc/date_picker_event.dart';
-import 'package:water_tracker/bloc/drinks_bloc/drinks_bloc.dart';
-import 'package:water_tracker/bloc/drinks_bloc/drinks_event.dart';
-import 'package:water_tracker/bloc/drinks_bloc/drinks_state.dart';
+import 'package:water_tracker/bloc/auth_bloc/auth_bloc_barrel.dart';
+import 'package:water_tracker/bloc/date_picker_bloc/date_picker_bloc_barrel.dart';
+import 'package:water_tracker/bloc/drinks_bloc/drinks_bloc_barrel.dart';
 import 'package:water_tracker/popup/add_water_popup.dart';
 import 'package:water_tracker/popup/popup_layout.dart';
 import 'package:water_tracker/repository/firestore_repository.dart';
 import 'package:water_tracker/routes.dart';
 
-import '../bloc/date_picker_bloc/date_picker_bloc.dart';
-import '../bloc/date_picker_bloc/date_picker_state.dart';
 import '../services/firebase/firestore.dart';
+
+class HomeScreenWrapper extends StatelessWidget {
+  const HomeScreenWrapper({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<DatePickerBloc>(
+          create: (context) =>
+          DatePickerBloc()
+            ..add(DatePickerSelectDate(
+                DateTime.parse(DateTime.now().toString().split(' ')[0]))),
+        ),
+        BlocProvider<DrinksBloc>(
+          create: (context) => DrinksBloc(FirestoreRepositoryImpl(FirestoreDatabase())),
+        ),
+      ],
+      child: const HomeScreen(),
+    );
+  }
+}
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -25,39 +40,25 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _datePickerBloc = DatePickerBloc()
-    ..add(DatePickerSelectDate(
-        DateTime.parse(DateTime.now().toString().split(' ')[0])));
-
-  //final _drinksBloc = DrinksBloc(FirestoreRepositoryImpl(FirestoreDatabase()));
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<DrinksBloc>(
-          create: (context) =>
-              DrinksBloc(FirestoreRepositoryImpl(FirestoreDatabase())),
-        ),
-        BlocProvider<DatePickerBloc>.value(value: _datePickerBloc),
-      ],
-      child: Scaffold(
-        body: BlocListener<AuthBloc, AuthState>(
-          listener: (context, state) {
-            if (state.status == AuthStatus.signedOut) {
-              Navigator.pushNamedAndRemoveUntil(
-                  context, loginScreenRoute, (route) => false);
-            }
-          },
-          child: SafeArea(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                _dateSelect(),
-                Expanded(flex: 4, child: _body()),
-                _bottomBar(),
-              ],
-            ),
+    return Scaffold(
+      body: BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state.status == AuthStatus.signedOut) {
+            Navigator.pushNamedAndRemoveUntil(
+                context, loginScreenRoute, (route) => false);
+          }
+        },
+        child: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              _dateSelect(),
+              Expanded(flex: 4, child: _body()),
+              _bottomBar(),
+            ],
           ),
         ),
       ),
@@ -66,7 +67,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _dateSelect() {
     return BlocBuilder<DatePickerBloc, DatePickerState>(
-        bloc: _datePickerBloc,
         builder: (context, state) {
           return Container(
             margin: const EdgeInsets.all(10.0),
@@ -83,12 +83,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     showDatePicker(
                       context: context,
                       initialDate: state.date ??
-                          DateTime.parse(
-                              DateTime.now().toString().split(' ')[0]),
+                          DateTime.parse(DateTime.now().toString().split(
+                              ' ')[0]),
                       firstDate: DateTime(2000),
                       lastDate: DateTime(2100),
                     ).then((date) {
-                      _datePickerBloc.add(DatePickerSelectDate(date!));
+                      context
+                          .read<DatePickerBloc>()
+                          .add(DatePickerSelectDate(date!));
                     });
                   },
                 ),
@@ -116,70 +118,59 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _body() {
-    return BlocBuilder<DatePickerBloc, DatePickerState>(
-        bloc: _datePickerBloc,
-        builder: (context, dateState) => Container(
-              margin: const EdgeInsets.all(10.0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                children: [
-                  ListTile(
-                    title: const Text("Today's drinks:"),
-                    trailing: IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.info_outlined)),
-                  ),
-                  StreamBuilder<DocumentSnapshot>(
-                      stream: FirestoreDatabase().getDayDoc(
-                          '${dateState.date?.millisecondsSinceEpoch}'),
-                      builder:
-                          (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                        if (!snapshot.hasData ||
-                            snapshot.data?.data() == null) {
-                          return const Text('No drinks added today');
-                        } else {
-                          context
-                              .read<DrinksBloc>()
-                              .add(LoadDrinks(snapshot.data!));
-                          return BlocBuilder<DrinksBloc, DrinkState>(
-                              builder: (context, drinkState) => Padding(
-                                    padding: const EdgeInsets.all(14.0),
-                                    child: ListView(
-                                        shrinkWrap: true,
-                                        children: drinkState.drinks
-                                            .map(
-                                              (water) => Column(
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Column(
-                                                        children: [
-                                                          Text(water.type),
-                                                          Text(water.time),
-                                                        ],
-                                                      ),
-                                                      Text('${water.amount}ml'),
-                                                    ],
-                                                  ),
-                                                  const Divider(
-                                                    color: Colors.black12,
-                                                  ),
-                                                ],
-                                              ),
-                                            )
-                                            .toList()),
-                                  ));
-                        }
-                      }),
-                ],
-              ),
-            ));
+    return BlocListener<DatePickerBloc, DatePickerState>(
+        listener: (context, state) {
+          context.read<DrinksBloc>().add(DrinksOverviewSubscriptionRequested(state.date!));
+        },
+        child: Container(
+          margin: const EdgeInsets.all(10.0),
+          width: MediaQuery
+              .of(context)
+              .size
+              .width,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: BlocBuilder<DrinksBloc, DrinkState>(
+              builder: (context, drinkState) =>
+                  Padding(
+                    padding: const EdgeInsets.all(14.0),
+                    child: ListView(shrinkWrap: true, children: [
+                      ListTile(
+                        title: const Text("Today's drinks:"),
+                        trailing: IconButton(
+                            onPressed: () {},
+                            icon: const Icon(Icons.info_outlined)),
+                      ),
+                      Column(
+                        children: drinkState.drinks
+                            .map((water) =>
+                            Dismissible(
+                              background: Container(
+                                color: Colors.red,
+                              ),
+                              direction: DismissDirection.endToStart,
+                              onDismissed: (direction) {
+                                context.read<DrinksBloc>().add(
+                                    DeleteDrink(
+                                        model: water,
+                                        date: context.read<DatePickerBloc>().state.date!
+                                            .millisecondsSinceEpoch
+                                            .toString()));
+                              },
+                              key: UniqueKey(),
+                              child: ListTile(
+                                title: Text(water.type),
+                                subtitle: Text(water.time),
+                                trailing: Text('${water.amount}ml'),
+                              ),
+                            ))
+                            .toList(),
+                      )
+                    ]),
+                  )),
+        ));
   }
 
   Widget _bottomBar() {

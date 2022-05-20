@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:water_tracker/models/water_model.dart';
 
-enum DrinkStatus { initial, success, failure }
+enum DrinkStatus { initial, success, failure, deleted }
 
 class DrinkState extends Equatable {
   final DrinkStatus status;

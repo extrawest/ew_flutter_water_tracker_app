@@ -7,6 +7,12 @@ abstract class DrinksEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+class DrinksOverviewSubscriptionRequested extends DrinksEvent {
+  final DateTime date;
+
+  DrinksOverviewSubscriptionRequested(this.date);
+}
+
 class AddDrink extends DrinksEvent {
   final String time;
   final int amount;
@@ -28,6 +34,7 @@ class LoadDrinks extends DrinksEvent {
 
 class DeleteDrink extends DrinksEvent {
   final WaterModel model;
+  final String date;
 
-  DeleteDrink(this.model);
+  DeleteDrink({required this.model, required this.date});
 }
