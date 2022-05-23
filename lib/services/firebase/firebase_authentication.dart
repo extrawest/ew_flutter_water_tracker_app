@@ -19,7 +19,7 @@ class AuthService {
       return user;
     } on FirebaseException catch (err) {
       log.severe('$err');
-      return null;
+      rethrow;
     }
   }
 
@@ -32,7 +32,7 @@ class AuthService {
       return user;
     } on FirebaseException catch (err) {
       log.severe('$err');
-      return null;
+      rethrow;
     }
   }
 

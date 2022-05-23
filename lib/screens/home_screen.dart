@@ -7,6 +7,7 @@ import 'package:water_tracker/popup/add_water_popup.dart';
 import 'package:water_tracker/popup/popup_layout.dart';
 import 'package:water_tracker/repository/firestore_repository.dart';
 import 'package:water_tracker/routes.dart';
+import 'package:water_tracker/widgets/drinks_list.dart';
 
 import '../services/firebase/firestore.dart';
 
@@ -115,52 +116,26 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _body() {
     return BlocListener<DatePickerBloc, DatePickerState>(
+        listenWhen: (previousState, state) {
+          if (previousState.date != state.date) {
+            return true;
+          } else {
+            return false;
+          }
+        },
         listener: (context, state) {
           context
               .read<DrinksBloc>()
               .add(DrinksOverviewSubscriptionRequested(state.date!));
         },
         child: Container(
-          margin: const EdgeInsets.all(10.0),
-          width: MediaQuery.of(context).size.width,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: BlocBuilder<DrinksBloc, DrinkState>(
-              builder: (context, drinkState) => Padding(
-                    padding: const EdgeInsets.all(14.0),
-                    child: ListView(shrinkWrap: true, children: [
-                      ListTile(
-                        title: const Text("Today's drinks:"),
-                        trailing: IconButton(
-                            onPressed: () {},
-                            icon: const Icon(Icons.info_outlined)),
-                      ),
-                      ...drinkState.drinks
-                            .map((water) => Dismissible(
-                                  background: Container(
-                                    color: Colors.red,
-                                  ),
-                                  direction: DismissDirection.endToStart,
-                                  onDismissed: (direction) {
-                                    context.read<DrinksBloc>().add(DeleteDrink(
-                                        model: water,
-                                        date: context
-                                            .read<DatePickerBloc>()
-                                            .state
-                                            .date!));
-                                  },
-                                  key: UniqueKey(),
-                                  child: ListTile(
-                                    title: Text(water.type),
-                                    subtitle: Text(water.time),
-                                    trailing: Text('${water.amount}ml'),
-                                  ),
-                                ))
-                    ]),
-                  )),
-        ));
+            margin: const EdgeInsets.all(10.0),
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const DrinksList()));
   }
 
   Widget _bottomBar() {
@@ -241,4 +216,5 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     });
   }
+
 }

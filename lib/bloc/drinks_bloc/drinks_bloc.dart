@@ -20,14 +20,11 @@ class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
       DrinksOverviewSubscriptionRequested event,
       Emitter<DrinkState> emit) async {
     final String date = event.date.toMillisecondsString();
+
     await emit.forEach(repository.getDayDoc(date),
-        onData: (DocumentSnapshot water) {
-      final Map<String, dynamic> json = water.data() as Map<String, dynamic>;
-      final List<WaterModel> waters =
-          List<WaterModel>.from(json['water'].map((e) {
-        return WaterModel.fromJson(e);
-      }));
-      return state.copyWith(status: DrinkStatus.success, drinks: waters);
+        onData: (DocumentSnapshot<List<WaterModel>> water) {
+      final List<WaterModel>? waters = water.data();
+      return state.copyWith(status: DrinkStatus.success, drinks: waters ?? []);
     });
   }
 

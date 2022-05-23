@@ -12,7 +12,7 @@ abstract class FirestoreRepository {
 
   Future<void> deleteWater(WaterModel waterModel, String date);
 
-  Stream<DocumentSnapshot> getDayDoc(String date);
+  Stream<DocumentSnapshot<List<WaterModel>>> getDayDoc(String date);
 }
 
 class FirestoreRepositoryImpl implements FirestoreRepository {
@@ -41,7 +41,7 @@ class FirestoreRepositoryImpl implements FirestoreRepository {
   }
 
   @override
-  Stream<DocumentSnapshot<Object?>> getDayDoc(String date) {
+  Stream<DocumentSnapshot<List<WaterModel>>> getDayDoc(String date) {
     return _firestoreDatabase.getDayDoc(date);
   }
 }
