@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:water_tracker/models/user_model.dart';
 import 'package:water_tracker/models/water_model.dart';
 
+final CollectionReference usersCollection = FirebaseFirestore.instance.collection('users');
+
 class FirestoreDatabase {
   final _db = FirebaseFirestore.instance;
   DocumentReference? userDoc;
@@ -10,29 +12,25 @@ class FirestoreDatabase {
   Future<void> addUser(UserModel model) async {
     /// We need to check if user has already existed in firestore
     /// in cases when we use Google or Facebook Authentication
-    if((await _db.collection('users').doc(model.id).get()).exists) {
+    if((await usersCollection.doc(model.id).get()).exists) {
       return;
     }
-    await _db
-        .collection('users')
+    await usersCollection
         .doc(model.id)
         .set(model.toJson());
     userDoc = _db.collection('users').doc(model.id);
   }
 
   Future<UserModel> getUser(String id) async {
-    userDoc = _db.collection('users').doc(id);
+    userDoc = usersCollection.doc(id);
 
-    final DocumentSnapshot<Map<String, dynamic>> documentSnapshot = await _db
-        .collection('users')
-        .doc(id).get();
+    final DocumentSnapshot documentSnapshot = await usersCollection.doc(id).get();
     return UserModel.fromJson(documentSnapshot.data() as Map<String, dynamic>);
   }
 
   Future<void> addWater(WaterModel waterModel, String date) async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
-    final CollectionReference _daysCollection = _db
-        .collection('users')
+    final CollectionReference _daysCollection = usersCollection
         .doc(uid)
         .collection('days');
 
@@ -42,8 +40,7 @@ class FirestoreDatabase {
 
   Future<void> deleteWater(WaterModel waterModel, String date) async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
-    final CollectionReference _daysCollection = _db
-        .collection('users')
+    final CollectionReference _daysCollection = usersCollection
         .doc(uid)
         .collection('days');
 
@@ -53,7 +50,7 @@ class FirestoreDatabase {
 
   Stream<DocumentSnapshot> getDayDoc(String date) {
     final uid = FirebaseAuth.instance.currentUser!.uid;
-    final dayDocRef = _db.collection('users').doc(uid).collection('days').doc(date);
+    final dayDocRef = usersCollection.doc(uid).collection('days').doc(date);
     return dayDocRef.snapshots();
   }
 }

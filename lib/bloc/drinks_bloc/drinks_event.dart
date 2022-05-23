@@ -17,7 +17,7 @@ class AddDrink extends DrinksEvent {
   final String time;
   final int amount;
   final String type;
-  final String date;
+  final DateTime date;
 
   AddDrink(
       {required this.time,
@@ -34,7 +34,7 @@ class LoadDrinks extends DrinksEvent {
 
 class DeleteDrink extends DrinksEvent {
   final WaterModel model;
-  final String date;
+  final DateTime date;
 
   DeleteDrink({required this.model, required this.date});
 }

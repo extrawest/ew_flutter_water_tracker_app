@@ -19,12 +19,11 @@ class HomeScreenWrapper extends StatelessWidget {
       providers: [
         BlocProvider<DatePickerBloc>(
           create: (context) =>
-          DatePickerBloc()
-            ..add(DatePickerSelectDate(
-                DateTime.parse(DateTime.now().toString().split(' ')[0]))),
+              DatePickerBloc()..add(DatePickerSelectDate(DateTime.now())),
         ),
         BlocProvider<DrinksBloc>(
-          create: (context) => DrinksBloc(FirestoreRepositoryImpl(FirestoreDatabase())),
+          create: (context) =>
+              DrinksBloc(FirestoreRepositoryImpl(FirestoreDatabase())),
         ),
       ],
       child: const HomeScreen(),
@@ -40,7 +39,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,73 +66,69 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _dateSelect() {
     return BlocBuilder<DatePickerBloc, DatePickerState>(
         builder: (context, state) {
-          return Container(
-            margin: const EdgeInsets.all(10.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
+      return Container(
+        margin: const EdgeInsets.all(10.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_drop_down),
+              onPressed: () {
+                showDatePicker(
+                  context: context,
+                  initialDate: state.date ?? DateTime.now(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2100),
+                ).then((date) {
+                  context
+                      .read<DatePickerBloc>()
+                      .add(DatePickerSelectDate(date!));
+                });
+              },
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Column(
               children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_drop_down),
-                  onPressed: () {
-                    showDatePicker(
-                      context: context,
-                      initialDate: state.date ??
-                          DateTime.parse(DateTime.now().toString().split(
-                              ' ')[0]),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                    ).then((date) {
-                      context
-                          .read<DatePickerBloc>()
-                          .add(DatePickerSelectDate(date!));
-                    });
-                  },
-                ),
-                Column(
-                  children: [
-                    Text(state.dayOfWeek),
-                    Text(state.dateInfo),
-                  ],
-                ),
-                Row(children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_left),
-                    onPressed: () {},
-                  ),
-                  const VerticalDivider(),
-                  IconButton(
-                    icon: const Icon(Icons.arrow_right),
-                    onPressed: () {},
-                  ),
-                ]),
+                Text(state.dayOfWeek),
+                Text(state.dateInfo),
               ],
             ),
-          );
-        });
+            Row(children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_left),
+                onPressed: () {},
+              ),
+              const VerticalDivider(),
+              IconButton(
+                icon: const Icon(Icons.arrow_right),
+                onPressed: () {},
+              ),
+            ]),
+          ],
+        ),
+      );
+    });
   }
 
   Widget _body() {
     return BlocListener<DatePickerBloc, DatePickerState>(
         listener: (context, state) {
-          context.read<DrinksBloc>().add(DrinksOverviewSubscriptionRequested(state.date!));
+          context
+              .read<DrinksBloc>()
+              .add(DrinksOverviewSubscriptionRequested(state.date!));
         },
         child: Container(
           margin: const EdgeInsets.all(10.0),
-          width: MediaQuery
-              .of(context)
-              .size
-              .width,
+          width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
           ),
           child: BlocBuilder<DrinksBloc, DrinkState>(
-              builder: (context, drinkState) =>
-                  Padding(
+              builder: (context, drinkState) => Padding(
                     padding: const EdgeInsets.all(14.0),
                     child: ListView(shrinkWrap: true, children: [
                       ListTile(
@@ -143,31 +137,27 @@ class _HomeScreenState extends State<HomeScreen> {
                             onPressed: () {},
                             icon: const Icon(Icons.info_outlined)),
                       ),
-                      Column(
-                        children: drinkState.drinks
-                            .map((water) =>
-                            Dismissible(
-                              background: Container(
-                                color: Colors.red,
-                              ),
-                              direction: DismissDirection.endToStart,
-                              onDismissed: (direction) {
-                                context.read<DrinksBloc>().add(
-                                    DeleteDrink(
+                      ...drinkState.drinks
+                            .map((water) => Dismissible(
+                                  background: Container(
+                                    color: Colors.red,
+                                  ),
+                                  direction: DismissDirection.endToStart,
+                                  onDismissed: (direction) {
+                                    context.read<DrinksBloc>().add(DeleteDrink(
                                         model: water,
-                                        date: context.read<DatePickerBloc>().state.date!
-                                            .millisecondsSinceEpoch
-                                            .toString()));
-                              },
-                              key: UniqueKey(),
-                              child: ListTile(
-                                title: Text(water.type),
-                                subtitle: Text(water.time),
-                                trailing: Text('${water.amount}ml'),
-                              ),
-                            ))
-                            .toList(),
-                      )
+                                        date: context
+                                            .read<DatePickerBloc>()
+                                            .state
+                                            .date!));
+                                  },
+                                  key: UniqueKey(),
+                                  child: ListTile(
+                                    title: Text(water.type),
+                                    subtitle: Text(water.time),
+                                    trailing: Text('${water.amount}ml'),
+                                  ),
+                                ))
                     ]),
                   )),
         ));

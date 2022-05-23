@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:water_tracker/bloc/drinks_bloc/drinks_event.dart';
 import 'package:water_tracker/bloc/drinks_bloc/drinks_state.dart';
+import 'package:water_tracker/common/extensions/datetime_to_milliseconds_to_string.dart';
 
 import 'package:water_tracker/models/water_model.dart';
 import 'package:water_tracker/repository/firestore_repository.dart';
@@ -18,10 +19,9 @@ class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
   Future<void> _onSubscriptionRequested(
       DrinksOverviewSubscriptionRequested event,
       Emitter<DrinkState> emit) async {
-    final String date = DateTime.parse(event.date.toString().split(' ')[0])
-        .millisecondsSinceEpoch
-        .toString();
-    await emit.forEach(repository.getDayDoc(date), onData: (DocumentSnapshot water) {
+    final String date = event.date.toMillisecondsString();
+    await emit.forEach(repository.getDayDoc(date),
+        onData: (DocumentSnapshot water) {
       final Map<String, dynamic> json = water.data() as Map<String, dynamic>;
       final List<WaterModel> waters =
           List<WaterModel>.from(json['water'].map((e) {
@@ -35,7 +35,7 @@ class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
     try {
       final WaterModel waterModel =
           WaterModel(amount: event.amount, time: event.time, type: event.type);
-      await repository.addWater(waterModel, event.date);
+      await repository.addWater(waterModel, event.date.toMillisecondsString());
     } catch (err) {
       emit(state.copyWith(status: DrinkStatus.failure, error: err.toString()));
     }
@@ -44,8 +44,8 @@ class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
   Future<void> _onDeleteDrink(
       DeleteDrink event, Emitter<DrinkState> emit) async {
     try {
-      await repository.deleteWater(event.model, event.date);
-      //emit(state.copyWith(status: DrinkStatus.deleted));
+      await repository.deleteWater(
+          event.model, event.date.toMillisecondsString());
     } catch (err) {
       emit(state.copyWith(status: DrinkStatus.failure, error: err.toString()));
     }

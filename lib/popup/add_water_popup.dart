@@ -100,9 +100,7 @@ class _AddWaterPopupState extends State<AddWaterPopup> {
                           date: context
                               .read<DatePickerBloc>()
                               .state
-                              .date!
-                              .millisecondsSinceEpoch
-                              .toString(),
+                              .date!,
                           type: _typeController.text,
                           amount: int.parse(_amountController.text)));
                       Navigator.pop(context);
