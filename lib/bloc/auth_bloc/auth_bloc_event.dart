@@ -15,8 +15,9 @@ class AuthSignIn extends AuthEvent {
 class AuthRegister extends AuthEvent {
   final String email;
   final String password;
+  final String name;
 
-  AuthRegister({required this.email, required this.password});
+  AuthRegister({required this.email, required this.password, required this.name});
 }
 
 class AuthSignInGoogle extends AuthEvent {}

@@ -9,7 +9,6 @@ import 'package:water_tracker/repository/firestore_repository.dart';
 import 'package:water_tracker/routes.dart';
 import 'package:water_tracker/widgets/drinks_list.dart';
 
-import '../services/firebase/firestore.dart';
 
 class HomeScreenWrapper extends StatelessWidget {
   const HomeScreenWrapper({Key? key}) : super(key: key);
@@ -24,7 +23,7 @@ class HomeScreenWrapper extends StatelessWidget {
         ),
         BlocProvider<DrinksBloc>(
           create: (context) =>
-              DrinksBloc(FirestoreRepositoryImpl(FirestoreDatabase())),
+              DrinksBloc(context.read<FirestoreRepositoryImpl>()),
         ),
       ],
       child: const HomeScreen(),
@@ -161,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   IconButton(
                     icon: const Icon(Icons.account_circle_outlined),
                     onPressed: () {
-                      context.read<AuthBloc>().add(AuthLogOut());
+                      Navigator.pushNamed(context, profileScreenRoute);
                     },
                   ),
                 ],

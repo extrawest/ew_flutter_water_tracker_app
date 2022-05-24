@@ -15,6 +15,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   final TextEditingController passwordController = TextEditingController();
 
+  final TextEditingController nameController = TextEditingController();
+
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
@@ -25,7 +27,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       body: BlocListener<AuthBloc, AuthState>(
         listener: (BuildContext context, state) {
-          if(state.status == AuthStatus.signedIn){
+          if (state.status == AuthStatus.signedIn) {
             Navigator.pushReplacementNamed(context, homeScreenRoute);
           }
         },
@@ -33,7 +35,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Column(
             children: [
               const Expanded(
-                  flex: 3,
+                  flex: 1,
                   child: Align(
                       alignment: Alignment.center, child: Text('Register'))),
               Expanded(flex: 5, child: _form()),
@@ -49,47 +51,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
       key: _formKey,
       child: Column(
         children: [
-          Padding(
-            padding:
-                const EdgeInsets.only(bottom: 8.0, left: 20.0, right: 20.0),
-            child: TextFormField(
+          _formField(
               controller: emailController,
-              style: const TextStyle(color: Color(0xff274a6d)),
-              decoration: _input(
-                emailController,
-                const Icon(Icons.account_circle_rounded),
-                'Enter your email',
-              ),
-            ),
-          ),
-          Padding(
-            padding:
-                const EdgeInsets.only(bottom: 8.0, left: 20.0, right: 20.0),
-            child: TextFormField(
+              obscure: false,
+              hint: 'Enter your Email',
+              icon: const Icon(Icons.account_circle_rounded)),
+          _formField(
+              controller: nameController,
+              obscure: false,
+              maxLength: 20,
+              hint: 'Enter your Name',
+              icon: const Icon(Icons.account_circle_rounded)),
+          _formField(
               controller: passwordController,
-              style: const TextStyle(color: Color(0xff274a6d)),
-              obscureText: true,
-              decoration: _input(
-                passwordController,
-                const Icon(Icons.security),
-                'Enter your password',
-              ),
-              validator: _validatePassword,
-            ),
-          ),
-          Padding(
-            padding:
-                const EdgeInsets.only(bottom: 8.0, left: 20.0, right: 20.0),
-            child: TextFormField(
-              controller: confirmPasswordController,
-              style: const TextStyle(color: Color(0xff274a6d)),
-              obscureText: true,
-              decoration: _input(
-                confirmPasswordController,
-                const Icon(Icons.security),
-                'Re-enter your password',
-              ),
-            ),
+              obscure: true,
+              maxLength: 15,
+              hint: 'Enter your Password',
+              icon: const Icon(Icons.security),
+              validator: _validatePassword),
+          _formField(
+            controller: confirmPasswordController,
+            obscure: true,
+            maxLength: 15,
+            hint: 'Re-enter your Password',
+            icon: const Icon(Icons.security),
           ),
           Container(
             margin: const EdgeInsets.all(20),
@@ -122,8 +107,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  Widget _formField(
+      {required TextEditingController controller,
+      required bool obscure,
+      int? maxLength,
+      required String hint,
+      required Icon icon,
+      String? Function(String?)? validator}) {
+    return Container(
+      height: 80,
+      margin: const EdgeInsets.only(bottom: 8.0, left: 20.0, right: 20.0),
+      child: TextFormField(
+        maxLength: maxLength,
+        controller: controller,
+        style: const TextStyle(color: Color(0xff274a6d)),
+        obscureText: obscure,
+        decoration: _input(
+          controller: controller,
+          icon: icon,
+          hint: hint,
+        ),
+        validator: validator,
+      ),
+    );
+  }
+
   InputDecoration _input(
-      TextEditingController controller, Icon icon, String hint) {
+      {required TextEditingController controller,
+      required Icon icon,
+      required String hint}) {
     return InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(fontSize: 20.0, color: Colors.black12),
@@ -153,13 +165,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _registerUser() {
     context.read<AuthBloc>().add(AuthRegister(
-        email: emailController.text, password: passwordController.text));
+        email: emailController.text,
+        password: passwordController.text,
+        name: nameController.text));
   }
 
   String? _validatePassword(String? value) {
-    if (passwordController.text.length < 6 ||
-        passwordController.text.length > 15) {
-      return 'Password must contain from 6 to 15 characters';
+    if (passwordController.text.length < 6) {
+      return 'Password must contain at least 6 characters';
     } else if (passwordController.text != confirmPasswordController.text) {
       return "Passwords doesn't match each other";
     }

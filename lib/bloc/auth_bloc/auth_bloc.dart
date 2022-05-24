@@ -22,12 +22,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onAuthSignIn(AuthSignIn event, Emitter<AuthState> emit) async {
     try {
       await authService.signInWithEmailAndPassword(event.email, event.password);
-      final user = UserModel(
-          email: authService.firebaseAuth.currentUser!.email!,
-          dailyWaterLimit: 3000,
-          id: authService.firebaseAuth.currentUser!.uid);
-
-      return emit(state.copyWith(status: AuthStatus.signedIn, user: user));
+      return emit(state.copyWith(status: AuthStatus.signedIn));
     } catch (err) {
       emit(state.copyWith(status: AuthStatus.failure, error: err.toString()));
     }
@@ -40,11 +35,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           event.email, event.password);
       final user = UserModel(
           email: authService.firebaseAuth.currentUser!.email!,
+          name: event.name,
           dailyWaterLimit: 3000,
           id: authService.firebaseAuth.currentUser!.uid);
       _addUserToFirestore(user);
 
-      return emit(state.copyWith(status: AuthStatus.signedIn, user: user));
+      return emit(state.copyWith(status: AuthStatus.signedIn));
     } catch (err) {
       emit(state.copyWith(status: AuthStatus.failure, error: err.toString()));
     }
@@ -56,11 +52,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await authService.signInWithGoogle();
       final user = UserModel(
           email: authService.firebaseAuth.currentUser!.email!,
+          name: '',
           dailyWaterLimit: 3000,
           id: authService.firebaseAuth.currentUser!.uid);
       _addUserToFirestore(user);
 
-      return emit(state.copyWith(status: AuthStatus.signedIn, user: user));
+      return emit(state.copyWith(status: AuthStatus.signedIn));
     } catch (err) {
       emit(state.copyWith(status: AuthStatus.failure, error: err.toString()));
     }
@@ -72,11 +69,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await authService.signInWithFacebook();
       final user = UserModel(
           email: authService.firebaseAuth.currentUser!.email!,
+          name: '',
           dailyWaterLimit: 3000,
           id: authService.firebaseAuth.currentUser!.uid);
       _addUserToFirestore(user);
 
-      return emit(state.copyWith(status: AuthStatus.signedIn, user: user));
+      return emit(state.copyWith(status: AuthStatus.signedIn));
     } catch (err) {
       emit(state.copyWith(status: AuthStatus.failure, error: err.toString()));
     }
@@ -85,7 +83,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onAuthLogOut(AuthLogOut event, Emitter<AuthState> emit) async {
     try {
       await authService.logOut();
-      return emit(state.copyWith(user: null, status: AuthStatus.signedOut));
+      return emit(state.copyWith(status: AuthStatus.signedOut));
     } catch (err) {
       emit(state.copyWith(error: err.toString()));
     }

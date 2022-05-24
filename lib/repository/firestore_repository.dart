@@ -8,7 +8,7 @@ abstract class FirestoreRepository {
 
   Future<void> addWater(WaterModel waterModel, String date);
 
-  Future<UserModel> getUser(String id);
+  Future<UserModel> getUser();
 
   Future<void> deleteWater(WaterModel waterModel, String date);
 
@@ -31,8 +31,8 @@ class FirestoreRepositoryImpl implements FirestoreRepository {
   }
 
   @override
-  Future<UserModel> getUser(String id) async {
-    return await _firestoreDatabase.getUser(id);
+  Future<UserModel> getUser() async {
+    return await _firestoreDatabase.getUser();
   }
 
   @override
