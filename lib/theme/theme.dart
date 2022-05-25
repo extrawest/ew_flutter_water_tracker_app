@@ -41,7 +41,7 @@ ThemeData lightTheme = ThemeData(
   fontFamily: GoogleFonts.roboto().fontFamily,
   textTheme: const TextTheme(
     headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
-    headline6: TextStyle(fontSize: 22.0, fontStyle: FontStyle.italic),
+    headline6: TextStyle(fontSize: 22.0,),
     bodyText1: TextStyle(color: Color(0xff274a6d)),
     bodyText2: TextStyle(fontSize: 14.0),
   ),

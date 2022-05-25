@@ -6,3 +6,16 @@ abstract class UserProfileEvent extends Equatable {
 }
 
 class LoadUserProfile extends UserProfileEvent {}
+
+class CheckEdit extends UserProfileEvent {
+  final bool check;
+
+  CheckEdit(this.check);
+}
+
+class SaveChanges extends UserProfileEvent {
+  final String name;
+  final String dailyWaterLimit;
+
+  SaveChanges(this.name, this.dailyWaterLimit);
+}

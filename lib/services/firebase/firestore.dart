@@ -4,12 +4,13 @@ import 'package:water_tracker/models/user_model.dart';
 import 'package:water_tracker/models/water_model.dart';
 import 'package:water_tracker/services/firebase/analytics_service.dart';
 
-final CollectionReference usersCollection =
-    FirebaseFirestore.instance.collection('users');
-
 class FirestoreDatabase {
   final AnalyticsService analyticsService;
+
   final String uid = FirebaseAuth.instance.currentUser!.uid;
+
+  final CollectionReference usersCollection =
+      FirebaseFirestore.instance.collection('users');
 
   FirestoreDatabase(this.analyticsService);
 
@@ -28,8 +29,19 @@ class FirestoreDatabase {
     return UserModel.fromJson(documentSnapshot.data() as Map<String, dynamic>);
   }
 
+  Future<void> updateUsername(String name) async {
+    await usersCollection
+        .doc(uid)
+        .update({'name': name});
+  }
+
+  Future<void> updateDailyLimit(int dailyWaterLimit) async {
+    await usersCollection
+        .doc(uid)
+        .update({'daily_water_limit': dailyWaterLimit});
+  }
+
   Future<void> addWater(WaterModel waterModel, String date) async {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
     final CollectionReference _daysCollection =
         usersCollection.doc(uid).collection('days');
 
@@ -40,7 +52,6 @@ class FirestoreDatabase {
   }
 
   Future<void> deleteWater(WaterModel waterModel, String date) async {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
     final CollectionReference _daysCollection =
         usersCollection.doc(uid).collection('days');
 
@@ -50,10 +61,10 @@ class FirestoreDatabase {
   }
 
   Stream<DocumentSnapshot<List<WaterModel>>> getDayDoc(String date) {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
     final dayDocRef = usersCollection.doc(uid).collection('days').doc(date);
 
-    return dayDocRef.withConverter<List<WaterModel>>(fromFirestore: (snapshot, _) {
+    return dayDocRef.withConverter<List<WaterModel>>(
+        fromFirestore: (snapshot, _) {
       return List<WaterModel>.from(snapshot['water'].map((e) {
         return WaterModel.fromJson(e);
       }));

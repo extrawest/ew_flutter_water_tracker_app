@@ -10,7 +10,8 @@ class ProfileScreenWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          UserProfileBloc(context.read<FirestoreRepositoryImpl>())..add(LoadUserProfile()),
+          UserProfileBloc(context.read<FirestoreRepositoryImpl>())
+            ..add(LoadUserProfile()),
       child: const ProfileScreen(),
     );
   }
@@ -24,25 +25,118 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  final _nameController = TextEditingController();
+  final _dailyLimitController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
+    final userProvider = context.read<UserProfileBloc>();
     return Scaffold(
-      body: BlocBuilder<UserProfileBloc, UserProfileState>(
-        builder: (context, state) {
-          if(state.status == UserProfileStatus.loading || state.status == UserProfileStatus.initial) {
-            return const Center(child: CircularProgressIndicator(),);
-          } else {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(state.user!.name),
-                Text(state.user!.email),
-              ],
-            );
-          }
-
-        }
+      appBar: AppBar(
+        title: const Text(
+          'Settings',
+          style: TextStyle(color: Colors.black45),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            color: Colors.black45,
+            onPressed: () {
+              userProvider.add(CheckEdit(true));
+            },
+            splashRadius: 15,
+          ),
+        ],
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_left_rounded),
+          color: Colors.black45,
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          splashRadius: 15,
+        ),
+        elevation: 0,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       ),
+      body: BlocConsumer<UserProfileBloc, UserProfileState>(
+          listenWhen: (previousState, currentState) {
+        if (currentState != previousState) {
+          return true;
+        } else {
+          return false;
+        }
+      }, listener: (context, state) {
+        if (state.status == UserProfileStatus.success) {
+          _nameController.text = state.user!.name;
+          _dailyLimitController.text = '${state.user!.dailyWaterLimit}';
+        }
+      }, builder: (context, state) {
+        if (state.status == UserProfileStatus.loading) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          return Form(
+            key: _formKey,
+            child: Container(
+              margin: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 16.0),
+                    child: TextFormField(
+                      controller: _nameController,
+                      style: TextStyle(
+                          color: state.isEdit
+                              ? const Color(0xff274a6d)
+                              : Colors.black38),
+                      enabled: state.isEdit,
+                      decoration: _formDecoration('Name'),
+                    ),
+                  ),
+                  TextFormField(
+                    controller: _dailyLimitController,
+                    style: TextStyle(
+                        color: state.isEdit
+                            ? const Color(0xff274a6d)
+                            : Colors.black38),
+                    enabled: state.isEdit,
+                    decoration: _formDecoration('Daily Water Limit'),
+                  ),
+                  Visibility(
+                      visible: state.isEdit,
+                      child: Row(
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              userProvider.add(SaveChanges(_nameController.text,
+                                  _dailyLimitController.text));
+                            },
+                            child: const Text('Apply'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              userProvider.add(CheckEdit(false));
+                            },
+                            child: const Text('Cancel'),
+                          ),
+                        ],
+                      )),
+                ],
+              ),
+            ),
+          );
+        }
+      }),
+    );
+  }
+
+  InputDecoration _formDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      border: const OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.black12, width: 1)),
     );
   }
 }

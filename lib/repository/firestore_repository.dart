@@ -10,6 +10,10 @@ abstract class FirestoreRepository {
 
   Future<UserModel> getUser();
 
+  Future<void> updateUsername(String name);
+
+  Future<void> updateDailyLimit(int dailyWaterLimit);
+
   Future<void> deleteWater(WaterModel waterModel, String date);
 
   Stream<DocumentSnapshot<List<WaterModel>>> getDayDoc(String date);
@@ -33,6 +37,16 @@ class FirestoreRepositoryImpl implements FirestoreRepository {
   @override
   Future<UserModel> getUser() async {
     return await _firestoreDatabase.getUser();
+  }
+
+  @override
+  Future<void> updateUsername(String name) async {
+    await _firestoreDatabase.updateUsername(name);
+  }
+
+  @override
+  Future<void> updateDailyLimit(int dailyWaterLimit) async {
+    await _firestoreDatabase.updateDailyLimit(dailyWaterLimit);
   }
 
   @override
