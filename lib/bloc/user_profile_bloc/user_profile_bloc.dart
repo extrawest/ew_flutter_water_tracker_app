@@ -1,47 +1,82 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:water_tracker/bloc/user_profile_bloc/user_profile_event.dart';
 import 'package:water_tracker/bloc/user_profile_bloc/user_profile_state.dart';
 import 'package:water_tracker/repository/firestore_repository.dart';
+import 'package:water_tracker/repository/storage_repository.dart';
 
 class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
-  final FirestoreRepository repository;
+  final FirestoreRepository firestoreRepository;
+  final StorageRepository storageRepository;
+  final imagePicker = ImagePicker();
 
-  UserProfileBloc(this.repository) : super(const UserProfileState()) {
+  UserProfileBloc(this.firestoreRepository, this.storageRepository)
+      : super(const UserProfileState()) {
     on<LoadUserProfile>(_onLoadUserProfile);
+    on<LoadUserPhoto>(_onLoadUserPhoto);
+    on<PickPhotoFromGallery>(_onPickPhotoFromGallery);
     on<CheckEdit>(_onCheckEdit);
     on<SaveChanges>(_onSaveChanges);
   }
 
   Future<void> _onLoadUserProfile(
       LoadUserProfile event, Emitter<UserProfileState> emit) async {
-    emit(state.copyWith(status: UserProfileStatus.loading));
-    final user = await repository.getUser();
-    return emit(state.copyWith(user: user, status: UserProfileStatus.success));
+    try {
+      emit(state.copyWith(status: UserProfileStatus.loading));
+      final user = await firestoreRepository.getUser();
+      return emit(state.copyWith(
+          user: user, photoUrl: '', status: UserProfileStatus.success));
+    } catch (e) {
+      emit(state.copyWith(status: UserProfileStatus.failure));
+    }
+  }
+
+  Future<void> _onLoadUserPhoto(
+      LoadUserPhoto event, Emitter<UserProfileState> emit) async {
+    try {
+      final photoUrl = await storageRepository.getPhotoUrl();
+      return emit(state.copyWith(photoUrl: photoUrl));
+    } catch (e) {
+      return emit(state.copyWith(photoUrl: ''));
+    }
   }
 
   Future<void> _onSaveChanges(
       SaveChanges event, Emitter<UserProfileState> emit) async {
-    if (event.name == state.user!.name &&
-        int.parse(event.dailyWaterLimit) == state.user!.dailyWaterLimit) {
+    final user = state.user!;
+    final int limit = int.parse(event.dailyWaterLimit);
+
+    if (event.name == user.name && limit == user.dailyWaterLimit) {
       return emit(state.copyWith(isEdit: false));
     }
     emit(state.copyWith(status: UserProfileStatus.updating));
-    if (event.name != state.user!.name) {
-      await repository.updateUsername(event.name);
+    if (event.name != user.name) {
+      await firestoreRepository.updateUsername(event.name);
     }
-    final int limit = int.parse(event.dailyWaterLimit);
-    if (limit != state.user!.dailyWaterLimit) {
-      await repository.updateDailyLimit(limit);
+    if (limit != user.dailyWaterLimit) {
+      await firestoreRepository.updateDailyLimit(limit);
     }
 
-    final user = await repository.getUser();
+    final newUser = await firestoreRepository.getUser();
     return emit(state.copyWith(
-        user: user, status: UserProfileStatus.success, isEdit: false));
+        user: newUser, status: UserProfileStatus.success, isEdit: false));
   }
 
   void _onCheckEdit(CheckEdit event, Emitter<UserProfileState> emit) {
     if (state.status == UserProfileStatus.success) {
       return emit(state.copyWith(isEdit: event.check));
     }
+  }
+
+  Future<void> _onPickPhotoFromGallery(
+      PickPhotoFromGallery event, Emitter<UserProfileState> emit) async {
+    final XFile? image =
+        await imagePicker.pickImage(source: ImageSource.gallery);
+    if (image == null) {
+      return;
+    }
+    await storageRepository.uploadFile(image);
+    final photoUrl = await storageRepository.getPhotoUrl();
+    return emit(state.copyWith(photoUrl: photoUrl));
   }
 }

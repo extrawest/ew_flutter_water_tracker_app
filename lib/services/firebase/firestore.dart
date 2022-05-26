@@ -33,6 +33,7 @@ class FirestoreDatabase {
     await usersCollection
         .doc(uid)
         .update({'name': name});
+    await analyticsService.nameUpdatedEvent(name);
   }
 
   Future<void> updateDailyLimit(int dailyWaterLimit) async {

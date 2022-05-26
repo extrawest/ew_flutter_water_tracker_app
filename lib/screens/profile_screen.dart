@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:water_tracker/bloc/user_profile_bloc/user_profile_barrel.dart';
 import 'package:water_tracker/repository/firestore_repository.dart';
+import 'package:water_tracker/repository/storage_repository.dart';
 
 class ProfileScreenWrapper extends StatelessWidget {
   const ProfileScreenWrapper({Key? key}) : super(key: key);
@@ -9,9 +10,10 @@ class ProfileScreenWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          UserProfileBloc(context.read<FirestoreRepositoryImpl>())
-            ..add(LoadUserProfile()),
+      create: (context) => UserProfileBloc(
+          context.read<FirestoreRepositoryImpl>(), context.read<StorageRepositoryImpl>())
+        ..add(LoadUserProfile())
+        ..add(LoadUserPhoto()),
       child: const ProfileScreen(),
     );
   }
@@ -38,6 +40,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           'Settings',
           style: TextStyle(color: Colors.black45),
         ),
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
@@ -77,54 +80,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: CircularProgressIndicator(),
           );
         } else {
-          return Form(
-            key: _formKey,
-            child: Container(
-              margin: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 16.0),
-                    child: TextFormField(
-                      controller: _nameController,
-                      style: TextStyle(
-                          color: state.isEdit
-                              ? const Color(0xff274a6d)
-                              : Colors.black38),
-                      enabled: state.isEdit,
-                      decoration: _formDecoration('Name'),
-                    ),
+          return Container(
+            margin: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                _userPhoto(context, state),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 16.0),
+                        child: TextFormField(
+                          controller: _nameController,
+                          style: TextStyle(
+                              color: state.isEdit
+                                  ? const Color(0xff274a6d)
+                                  : Colors.black38),
+                          enabled: state.isEdit,
+                          decoration: _formDecoration('Name'),
+                        ),
+                      ),
+                      TextFormField(
+                        controller: _dailyLimitController,
+                        style: TextStyle(
+                            color: state.isEdit
+                                ? const Color(0xff274a6d)
+                                : Colors.black38),
+                        enabled: state.isEdit,
+                        decoration: _formDecoration('Daily Water Limit'),
+                      ),
+                      Visibility(
+                          visible: state.isEdit,
+                          child: Row(
+                            children: [
+                              TextButton(
+                                onPressed: () {
+                                  userProvider.add(SaveChanges(
+                                      _nameController.text,
+                                      _dailyLimitController.text));
+                                },
+                                child: const Text('Apply'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  userProvider.add(CheckEdit(false));
+                                },
+                                child: const Text('Cancel'),
+                              ),
+                            ],
+                          )),
+                    ],
                   ),
-                  TextFormField(
-                    controller: _dailyLimitController,
-                    style: TextStyle(
-                        color: state.isEdit
-                            ? const Color(0xff274a6d)
-                            : Colors.black38),
-                    enabled: state.isEdit,
-                    decoration: _formDecoration('Daily Water Limit'),
-                  ),
-                  Visibility(
-                      visible: state.isEdit,
-                      child: Row(
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              userProvider.add(SaveChanges(_nameController.text,
-                                  _dailyLimitController.text));
-                            },
-                            child: const Text('Apply'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              userProvider.add(CheckEdit(false));
-                            },
-                            child: const Text('Cancel'),
-                          ),
-                        ],
-                      )),
-                ],
-              ),
+                ),
+              ],
             ),
           );
         }
@@ -137,6 +146,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
       labelText: label,
       border: const OutlineInputBorder(
           borderSide: BorderSide(color: Colors.black12, width: 1)),
+    );
+  }
+
+  Widget _userPhoto(BuildContext context, UserProfileState state) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 15),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 60,
+            height: 60,
+            child: CircleAvatar(
+              backgroundImage: NetworkImage(state.photoUrl),
+            ),
+          ),
+          Visibility(
+            visible: state.isEdit,
+            child: SizedBox(
+              width: 140,
+              child: TextButton(
+                onPressed: () {
+                  context.read<UserProfileBloc>().add(PickPhotoFromGallery());
+                },
+                child: const Text('Set new photo'),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
