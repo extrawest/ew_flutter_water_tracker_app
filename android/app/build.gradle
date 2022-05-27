@@ -24,6 +24,7 @@ if (flutterVersionName == null) {
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
@@ -51,6 +52,15 @@ android {
         release {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
+//            firebaseCrashlytics {
+//                // Enable processing and uploading of native symbols to Firebase servers.
+//                // By default, this is disabled to improve build speeds.
+//                // This flag must be enabled to see properly-symbolicated native
+//                // stack traces in the Crashlytics dashboard.
+//                nativeSymbolUploadEnabled true
+//                strippedNativeLibsDir 'build/intermediates/stripped_native_libs/release/out/lib'
+//                unstrippedNativeLibsDir 'build/intermediates/merged_native_libs/release/out/lib'
+//            }
         }
     }
 }
@@ -62,6 +72,7 @@ flutter {
 dependencies {
     implementation platform('com.google.firebase:firebase-bom:30.0.0')
     implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-crashlytics-ndk'
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.facebook.android:facebook-login:latest.release'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

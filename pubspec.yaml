@@ -44,6 +44,7 @@ dependencies:
   firebase_analytics: ^9.1.8
   image_picker: ^0.8.5+3
   firebase_storage: ^10.2.16
+  firebase_crashlytics: ^2.8.1
 
 
 dev_dependencies:
@@ -70,6 +71,7 @@ flutter:
     - assets/images/drop.png
     - assets/images/google.png
     - assets/images/facebook.png
+    - assets/images/account.png
 
   fonts:
     - family: SFUIDisplay

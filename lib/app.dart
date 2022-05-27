@@ -8,6 +8,7 @@ import 'package:water_tracker/repository/firestore_repository.dart';
 import 'package:water_tracker/repository/storage_repository.dart';
 import 'package:water_tracker/routes.dart';
 import 'package:water_tracker/services/firebase/analytics_service.dart';
+import 'package:water_tracker/services/firebase/crashlytics_service.dart';
 import 'package:water_tracker/services/firebase/firebase_authentication.dart';
 import 'package:water_tracker/services/firebase/firestore.dart';
 import 'package:water_tracker/services/firebase/storage_service.dart';
@@ -24,6 +25,7 @@ class _ApplicationState extends State<Application> {
     final localizationDelegate = LocalizedApp.of(context).delegate;
     final _authService = AuthService();
     final _analyticsService = AnalyticsService();
+    final _crashlyticsService = CrashlyticsService()..listenAuthState(_authService);
     final _firestoreDatabase = FirestoreDatabase(_analyticsService);
     final _firestoreRepository = FirestoreRepositoryImpl(_firestoreDatabase);
     final _storageRepository =
@@ -37,13 +39,15 @@ class _ApplicationState extends State<Application> {
           BlocProvider<AuthBloc>(
               create: (context) => AuthBloc(
                   authService: _authService,
-                  firestoreRepository: _firestoreRepository)),
+                  firestoreRepository: _firestoreRepository,
+                  crashlyticsService: _crashlyticsService)),
           Provider<FirestoreRepositoryImpl>(
             create: (context) => _firestoreRepository,
           ),
           Provider<StorageRepositoryImpl>(
             create: (context) => _storageRepository,
           ),
+          Provider<CrashlyticsService>(create: (context) => _crashlyticsService,),
         ],
         child: Consumer<ThemeViewModel>(builder: (context, themeViewModel, _) {
           return MaterialApp(
