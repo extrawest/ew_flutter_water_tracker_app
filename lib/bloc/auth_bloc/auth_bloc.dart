@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:water_tracker/bloc/auth_bloc/auth_bloc_event.dart';
 import 'package:water_tracker/bloc/auth_bloc/auth_bloc_state.dart';
 import 'package:water_tracker/models/user_model.dart';
+import 'package:water_tracker/services/firebase/crashlytics_service.dart';
 import 'package:water_tracker/services/firebase/firebase_authentication.dart';
 
 import '../../repository/firestore_repository.dart';
@@ -9,8 +10,9 @@ import '../../repository/firestore_repository.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthService authService;
   final FirestoreRepository firestoreRepository;
+  final CrashlyticsService crashlyticsService;
 
-  AuthBloc({required this.authService, required this.firestoreRepository})
+  AuthBloc({required this.authService, required this.firestoreRepository, required this.crashlyticsService})
       : super(const AuthState()) {
     on<AuthSignIn>(_onAuthSignIn);
     on<AuthRegister>(_onAuthRegister);
@@ -21,9 +23,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onAuthSignIn(AuthSignIn event, Emitter<AuthState> emit) async {
     try {
+      emit(state.copyWith(status: AuthStatus.loading));
       await authService.signInWithEmailAndPassword(event.email, event.password);
       return emit(state.copyWith(status: AuthStatus.signedIn));
     } catch (err) {
+      crashlyticsService.recError(err.toString());
       emit(state.copyWith(status: AuthStatus.failure, error: err.toString()));
     }
   }
@@ -39,9 +43,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           dailyWaterLimit: 3000,
           id: authService.firebaseAuth.currentUser!.uid);
       _addUserToFirestore(user);
-
       return emit(state.copyWith(status: AuthStatus.signedIn));
     } catch (err) {
+      crashlyticsService.recError(err.toString());
       emit(state.copyWith(status: AuthStatus.failure, error: err.toString()));
     }
   }
@@ -59,6 +63,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       return emit(state.copyWith(status: AuthStatus.signedIn));
     } catch (err) {
+      crashlyticsService.recError(err.toString());
       emit(state.copyWith(status: AuthStatus.failure, error: err.toString()));
     }
   }
@@ -76,6 +81,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       return emit(state.copyWith(status: AuthStatus.signedIn));
     } catch (err) {
+      crashlyticsService.recError(err.toString());
       emit(state.copyWith(status: AuthStatus.failure, error: err.toString()));
     }
   }
@@ -85,6 +91,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await authService.logOut();
       return emit(state.copyWith(status: AuthStatus.signedOut));
     } catch (err) {
+      crashlyticsService.recError(err.toString());
       emit(state.copyWith(error: err.toString()));
     }
   }

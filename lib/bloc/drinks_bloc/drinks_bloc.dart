@@ -6,11 +6,14 @@ import 'package:water_tracker/common/extensions/datetime_to_milliseconds_to_stri
 
 import 'package:water_tracker/models/water_model.dart';
 import 'package:water_tracker/repository/firestore_repository.dart';
+import 'package:water_tracker/services/firebase/crashlytics_service.dart';
 
 class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
   final FirestoreRepository repository;
+  final CrashlyticsService crashlyticsService;
 
-  DrinksBloc(this.repository) : super(const DrinkState()) {
+  DrinksBloc(this.repository, this.crashlyticsService)
+      : super(const DrinkState()) {
     on<AddDrink>(_onAddDrink);
     on<DeleteDrink>(_onDeleteDrink);
     on<DrinksOverviewSubscriptionRequested>(_onSubscriptionRequested);
@@ -25,6 +28,9 @@ class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
         onData: (DocumentSnapshot<List<WaterModel>> water) {
       final List<WaterModel>? waters = water.data();
       return state.copyWith(status: DrinkStatus.success, drinks: waters ?? []);
+    }, onError: (_, __) {
+      crashlyticsService.recError('failed to subscribe on day document');
+      return state.copyWith(status: DrinkStatus.failure);
     });
   }
 
@@ -34,6 +40,7 @@ class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
           WaterModel(amount: event.amount, time: event.time, type: event.type);
       await repository.addWater(waterModel, event.date.toMillisecondsString());
     } catch (err) {
+      crashlyticsService.recError(err.toString());
       emit(state.copyWith(status: DrinkStatus.failure, error: err.toString()));
     }
   }
@@ -44,6 +51,7 @@ class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
       await repository.deleteWater(
           event.model, event.date.toMillisecondsString());
     } catch (err) {
+      crashlyticsService.recError(err.toString());
       emit(state.copyWith(status: DrinkStatus.failure, error: err.toString()));
     }
   }

@@ -7,6 +7,7 @@ import 'package:water_tracker/popup/add_water_popup.dart';
 import 'package:water_tracker/popup/popup_layout.dart';
 import 'package:water_tracker/repository/firestore_repository.dart';
 import 'package:water_tracker/routes.dart';
+import 'package:water_tracker/services/firebase/crashlytics_service.dart';
 import 'package:water_tracker/widgets/drinks_list.dart';
 
 
@@ -23,7 +24,7 @@ class HomeScreenWrapper extends StatelessWidget {
         ),
         BlocProvider<DrinksBloc>(
           create: (context) =>
-              DrinksBloc(context.read<FirestoreRepositoryImpl>()),
+              DrinksBloc(context.read<FirestoreRepositoryImpl>(), context.read<CrashlyticsService>()),
         ),
       ],
       child: const HomeScreen(),
@@ -154,7 +155,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.stacked_bar_chart),
-                    onPressed: () {},
+                    onPressed: () {
+                      throw Exception();
+                    },
                   ),
                   const SizedBox(),
                   IconButton(

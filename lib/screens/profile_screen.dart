@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:water_tracker/bloc/auth_bloc/auth_bloc_barrel.dart';
 import 'package:water_tracker/bloc/user_profile_bloc/user_profile_barrel.dart';
 import 'package:water_tracker/repository/firestore_repository.dart';
 import 'package:water_tracker/repository/storage_repository.dart';
+import 'package:water_tracker/services/firebase/crashlytics_service.dart';
 
 class ProfileScreenWrapper extends StatelessWidget {
   const ProfileScreenWrapper({Key? key}) : super(key: key);
@@ -11,7 +13,9 @@ class ProfileScreenWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => UserProfileBloc(
-          context.read<FirestoreRepositoryImpl>(), context.read<StorageRepositoryImpl>())
+          firestoreRepository: context.read<FirestoreRepositoryImpl>(),
+          storageRepository: context.read<StorageRepositoryImpl>(),
+          crashlyticsService: context.read<CrashlyticsService>())
         ..add(LoadUserProfile())
         ..add(LoadUserPhoto()),
       child: const ProfileScreen(),
@@ -85,54 +89,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Column(
               children: [
                 _userPhoto(context, state),
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 16.0),
-                        child: TextFormField(
-                          controller: _nameController,
-                          style: TextStyle(
-                              color: state.isEdit
-                                  ? const Color(0xff274a6d)
-                                  : Colors.black38),
-                          enabled: state.isEdit,
-                          decoration: _formDecoration('Name'),
-                        ),
-                      ),
-                      TextFormField(
-                        controller: _dailyLimitController,
-                        style: TextStyle(
-                            color: state.isEdit
-                                ? const Color(0xff274a6d)
-                                : Colors.black38),
-                        enabled: state.isEdit,
-                        decoration: _formDecoration('Daily Water Limit'),
-                      ),
-                      Visibility(
-                          visible: state.isEdit,
-                          child: Row(
-                            children: [
-                              TextButton(
-                                onPressed: () {
-                                  userProvider.add(SaveChanges(
-                                      _nameController.text,
-                                      _dailyLimitController.text));
-                                },
-                                child: const Text('Apply'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  userProvider.add(CheckEdit(false));
-                                },
-                                child: const Text('Cancel'),
-                              ),
-                            ],
-                          )),
-                    ],
-                  ),
-                ),
+                _form(context, state),
+                _logOutButton(context, state),
               ],
             ),
           );
@@ -157,8 +115,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           SizedBox(
             width: 60,
             height: 60,
-            child: CircleAvatar(
+            child: state.photoUrl != '' ? CircleAvatar(
               backgroundImage: NetworkImage(state.photoUrl),
+            ) : CircleAvatar(
+              child: Image.asset('assets/images/account.png'),
             ),
           ),
           Visibility(
@@ -174,6 +134,75 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _form(BuildContext context, UserProfileState state) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          Container(
+            margin: const EdgeInsets.only(bottom: 16.0),
+            child: TextFormField(
+              controller: _nameController,
+              style: TextStyle(
+                  color: state.isEdit
+                      ? const Color(0xff274a6d)
+                      : Colors.black38),
+              enabled: state.isEdit,
+              decoration: _formDecoration('Name'),
+            ),
+          ),
+          TextFormField(
+            controller: _dailyLimitController,
+            style: TextStyle(
+                color: state.isEdit
+                    ? const Color(0xff274a6d)
+                    : Colors.black38),
+            enabled: state.isEdit,
+            decoration: _formDecoration('Daily Water Limit'),
+          ),
+          Visibility(
+              visible: state.isEdit,
+              child: Row(
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      context.read<UserProfileBloc>().add(SaveChanges(
+                          _nameController.text,
+                          _dailyLimitController.text));
+                    },
+                    child: const Text('Save changes'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      context.read<UserProfileBloc>().add(CheckEdit(false));
+                    },
+                    child: const Text('Cancel'),
+                  ),
+                ],
+              )),
+        ],
+      ),
+    );
+  }
+
+  Widget _logOutButton(BuildContext context, UserProfileState state) {
+    return Visibility(
+      visible: state.isEdit,
+      child: Container(
+        margin: const EdgeInsets.only(top: 60),
+        child: TextButton(
+          style: TextButton.styleFrom(
+            backgroundColor: Colors.white,
+            minimumSize: Size(MediaQuery.of(context).size.width, 30),
+          ),
+            onPressed: (){
+              context.read<AuthBloc>().add(AuthLogOut());
+            },
+            child: const Text('Log Out', style: TextStyle(color: Colors.red),)),
       ),
     );
   }
