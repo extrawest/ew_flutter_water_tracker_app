@@ -3,13 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:water_tracker/bloc/auth_bloc/auth_bloc_barrel.dart';
 import 'package:water_tracker/bloc/date_picker_bloc/date_picker_bloc_barrel.dart';
 import 'package:water_tracker/bloc/drinks_bloc/drinks_bloc_barrel.dart';
+import 'package:water_tracker/bloc/home_cubit/home_cubit.dart';
 import 'package:water_tracker/popup/add_water_popup.dart';
 import 'package:water_tracker/popup/popup_layout.dart';
 import 'package:water_tracker/repository/firestore_repository.dart';
 import 'package:water_tracker/routes.dart';
 import 'package:water_tracker/services/firebase/crashlytics_service.dart';
 import 'package:water_tracker/widgets/drinks_list.dart';
-
+import 'package:water_tracker/widgets/drinks_overall.dart';
 
 class HomeScreenWrapper extends StatelessWidget {
   const HomeScreenWrapper({Key? key}) : super(key: key);
@@ -18,13 +19,17 @@ class HomeScreenWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider(
+          create: (context) => HomeCubit(),
+        ),
         BlocProvider<DatePickerBloc>(
           create: (context) =>
               DatePickerBloc()..add(DatePickerSelectDate(DateTime.now())),
         ),
         BlocProvider<DrinksBloc>(
-          create: (context) =>
-              DrinksBloc(context.read<FirestoreRepositoryImpl>(), context.read<CrashlyticsService>()),
+          create: (context) => DrinksBloc(
+              context.read<FirestoreRepositoryImpl>(),
+              context.read<CrashlyticsService>()),
         ),
       ],
       child: const HomeScreen(),
@@ -135,7 +140,12 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const DrinksList()));
+            child: BlocBuilder<HomeCubit, HomeState>(
+              builder: (context, homeState) {
+                return homeState.tab == HomeTab.drinks ? const DrinksList() : const DrinksOverall();
+              },
+            ),
+        ));
   }
 
   Widget _bottomBar() {
@@ -218,5 +228,4 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     });
   }
-
 }

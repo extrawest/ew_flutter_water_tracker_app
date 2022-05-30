@@ -45,6 +45,8 @@ dependencies:
   image_picker: ^0.8.5+3
   firebase_storage: ^10.2.16
   firebase_crashlytics: ^2.8.1
+  firebase_remote_config: ^2.0.8
+  percent_indicator: ^4.2.1
 
 
 dev_dependencies:
