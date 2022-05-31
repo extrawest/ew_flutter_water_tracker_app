@@ -38,3 +38,7 @@ class DeleteDrink extends DrinksEvent {
 
   DeleteDrink({required this.model, required this.date});
 }
+
+class CountOverall extends DrinksEvent {}
+
+class LoadDailyLimit extends DrinksEvent {}

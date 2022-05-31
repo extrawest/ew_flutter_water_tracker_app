@@ -25,8 +25,9 @@ class FirestoreDatabase {
     final String uid = FirebaseAuth.instance.currentUser!.uid;
     try {
       final DocumentSnapshot documentSnapshot =
-      await usersCollection.doc(uid).get();
-      return UserModel.fromJson(documentSnapshot.data() as Map<String, dynamic>);
+          await usersCollection.doc(uid).get();
+      return UserModel.fromJson(
+          documentSnapshot.data() as Map<String, dynamic>);
     } catch (e) {
       rethrow;
     }
@@ -34,11 +35,20 @@ class FirestoreDatabase {
 
   Future<void> updateUsername(String name) async {
     final String uid = FirebaseAuth.instance.currentUser!.uid;
-    try{
-      await usersCollection
-        .doc(uid)
-        .update({'name': name});
+    try {
+      await usersCollection.doc(uid).update({'name': name});
       await analyticsService.nameUpdatedEvent(name);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<int> getDailyLimit() async {
+    final String uid = FirebaseAuth.instance.currentUser!.uid;
+    try {
+      final userDoc = await usersCollection.doc(uid).get();
+      final user = userDoc.data() as Map<String, dynamic>;
+      return user['daily_water_limit'];
     } catch (e) {
       rethrow;
     }
@@ -59,7 +69,7 @@ class FirestoreDatabase {
     final String uid = FirebaseAuth.instance.currentUser!.uid;
     try {
       final CollectionReference _daysCollection =
-      usersCollection.doc(uid).collection('days');
+          usersCollection.doc(uid).collection('days');
 
       await _daysCollection.doc(date).set({
         'water': FieldValue.arrayUnion([waterModel.toJson()])
@@ -74,7 +84,7 @@ class FirestoreDatabase {
     final String uid = FirebaseAuth.instance.currentUser!.uid;
     try {
       final CollectionReference _daysCollection =
-      usersCollection.doc(uid).collection('days');
+          usersCollection.doc(uid).collection('days');
 
       await _daysCollection.doc(date).update({
         'water': FieldValue.arrayRemove([waterModel.toJson()])
@@ -89,14 +99,14 @@ class FirestoreDatabase {
     try {
       final dayDocRef = usersCollection.doc(uid).collection('days').doc(date);
 
-      return dayDocRef.withConverter<List<WaterModel>>(
-          fromFirestore: (snapshot, _) {
-            return List<WaterModel>.from(snapshot['water'].map((e) {
-              return WaterModel.fromJson(e);
-            }));
-          }, toFirestore: (model, _) {
-        return {};
-      }).snapshots();
+      return dayDocRef
+          .withConverter<List<WaterModel>>(
+              fromFirestore: (snapshot, _) {
+                return List<WaterModel>.from(
+                    snapshot['water'].map((e) => WaterModel.fromJson(e)));
+              },
+              toFirestore: (model, _) => {})
+          .snapshots();
     } catch (e) {
       rethrow;
     }

@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:water_tracker/models/user_model.dart';
 
-enum UserProfileStatus { loading, success, failure, updating }
+enum UserProfileStatus { initial, success, failure, updating, updatedDailyLimit }
 
 class UserProfileState extends Equatable {
   final UserModel? user;
@@ -11,7 +11,7 @@ class UserProfileState extends Equatable {
 
   const UserProfileState(
       {this.user,
-      this.status = UserProfileStatus.loading,
+      this.status = UserProfileStatus.initial,
       this.isEdit = false, this.photoUrl = ''});
 
   UserProfileState copyWith(

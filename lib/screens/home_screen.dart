@@ -4,11 +4,11 @@ import 'package:water_tracker/bloc/auth_bloc/auth_bloc_barrel.dart';
 import 'package:water_tracker/bloc/date_picker_bloc/date_picker_bloc_barrel.dart';
 import 'package:water_tracker/bloc/drinks_bloc/drinks_bloc_barrel.dart';
 import 'package:water_tracker/bloc/home_cubit/home_cubit.dart';
-import 'package:water_tracker/popup/add_water_popup.dart';
-import 'package:water_tracker/popup/popup_layout.dart';
 import 'package:water_tracker/repository/firestore_repository.dart';
 import 'package:water_tracker/routes.dart';
+import 'package:water_tracker/screens/profile_screen.dart';
 import 'package:water_tracker/services/firebase/crashlytics_service.dart';
+import 'package:water_tracker/widgets/add_water_button.dart';
 import 'package:water_tracker/widgets/drinks_list.dart';
 import 'package:water_tracker/widgets/drinks_overall.dart';
 
@@ -29,7 +29,8 @@ class HomeScreenWrapper extends StatelessWidget {
         BlocProvider<DrinksBloc>(
           create: (context) => DrinksBloc(
               context.read<FirestoreRepositoryImpl>(),
-              context.read<CrashlyticsService>()),
+              context.read<CrashlyticsService>())
+            ..add(LoadDailyLimit()),
         ),
       ],
       child: const HomeScreen(),
@@ -134,17 +135,19 @@ class _HomeScreenState extends State<HomeScreen> {
               .add(DrinksOverviewSubscriptionRequested(state.date!));
         },
         child: Container(
-            margin: const EdgeInsets.all(10.0),
-            width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: BlocBuilder<HomeCubit, HomeState>(
-              builder: (context, homeState) {
-                return homeState.tab == HomeTab.drinks ? const DrinksList() : const DrinksOverall();
-              },
-            ),
+          margin: const EdgeInsets.all(10.0),
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: BlocBuilder<HomeCubit, HomeState>(
+            builder: (context, homeState) {
+              return homeState.tab == HomeTab.drinks
+                  ? const DrinksList()
+                  : const DrinksOverall();
+            },
+          ),
         ));
   }
 
@@ -173,56 +176,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   IconButton(
                     icon: const Icon(Icons.account_circle_outlined),
                     onPressed: () {
-                      Navigator.pushNamed(context, profileScreenRoute);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => BlocProvider<DrinksBloc>.value(
+                                    value: context.read<DrinksBloc>(),
+                                    child: const ProfileScreenWrapper(),
+                                  )));
                     },
                   ),
                 ],
               ),
             ),
-            Align(
-              alignment: Alignment.center,
-              child: Container(
-                  height: 70,
-                  width: 70,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: const [
-                        BoxShadow(
-                            color: Colors.blue,
-                            spreadRadius: 0.3,
-                            blurRadius: 10,
-                            offset: Offset(0, 5))
-                      ],
-                      gradient: const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: <Color>[
-                          Color(0xff50b3fb),
-                          Color(0xff0082fa),
-                        ],
-                      )),
-                  child: IconButton(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            PopupLayout(
-                                child: MultiBlocProvider(providers: [
-                                  BlocProvider.value(
-                                    value: context.read<DatePickerBloc>(),
-                                  ),
-                                  BlocProvider.value(
-                                    value: context.read<DrinksBloc>(),
-                                  )
-                                ], child: const AddWaterPopup()),
-                                top: 170,
-                                bottom: 170));
-                      },
-                      icon: const Icon(
-                        Icons.add_rounded,
-                        color: Colors.white,
-                        size: 40,
-                      ))),
-            ),
+            const AddWaterButton(),
           ],
         ),
       );

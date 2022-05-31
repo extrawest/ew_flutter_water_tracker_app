@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:water_tracker/bloc/drinks_bloc/drinks_event.dart';
-import 'package:water_tracker/bloc/drinks_bloc/drinks_state.dart';
+import 'package:water_tracker/bloc/drinks_bloc/drinks_bloc_barrel.dart';
 import 'package:water_tracker/common/extensions/datetime_to_milliseconds_to_string.dart';
 
 import 'package:water_tracker/models/water_model.dart';
@@ -17,6 +16,8 @@ class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
     on<AddDrink>(_onAddDrink);
     on<DeleteDrink>(_onDeleteDrink);
     on<DrinksOverviewSubscriptionRequested>(_onSubscriptionRequested);
+    on<LoadDailyLimit>(_onLoadDailyLimit);
+    on<CountOverall>(_onCountOverall);
   }
 
   Future<void> _onSubscriptionRequested(
@@ -27,6 +28,7 @@ class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
     await emit.forEach(repository.getDayDoc(date),
         onData: (DocumentSnapshot<List<WaterModel>> water) {
       final List<WaterModel>? waters = water.data();
+      add(CountOverall());
       return state.copyWith(status: DrinkStatus.success, drinks: waters ?? []);
     }, onError: (_, __) {
       crashlyticsService.recError('failed to subscribe on day document');
@@ -50,6 +52,29 @@ class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
     try {
       await repository.deleteWater(
           event.model, event.date.toMillisecondsString());
+    } catch (err) {
+      crashlyticsService.recError(err.toString());
+      emit(state.copyWith(status: DrinkStatus.failure, error: err.toString()));
+    }
+  }
+
+  void _onCountOverall(
+      CountOverall event, Emitter<DrinkState> emit) {
+    int drunkWater = 0;
+    final drinks = state.drinks;
+    for (final i in drinks) {
+      drunkWater += i.amount;
+    }
+    emit(state.copyWith(drunkWater: drunkWater));
+  }
+
+  Future<void> _onLoadDailyLimit(
+      LoadDailyLimit event, Emitter<DrinkState> emit) async {
+    try {
+      emit(state.copyWith(status: DrinkStatus.loading));
+      final dailyLimit = await repository.getDailyLimit();
+      emit(state.copyWith(
+          dailyWaterLimit: dailyLimit, status: DrinkStatus.success));
     } catch (err) {
       crashlyticsService.recError(err.toString());
       emit(state.copyWith(status: DrinkStatus.failure, error: err.toString()));

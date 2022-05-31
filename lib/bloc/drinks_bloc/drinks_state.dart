@@ -1,25 +1,35 @@
 import 'package:equatable/equatable.dart';
 import 'package:water_tracker/models/water_model.dart';
 
-enum DrinkStatus { initial, success, failure, deleted }
+enum DrinkStatus { initial, loading, success, failure, deleted }
 
 class DrinkState extends Equatable {
   final DrinkStatus status;
   final String error;
   final List<WaterModel> drinks;
+  final int drunkWater;
+  final int dailyWaterLimit;
 
   const DrinkState(
       {this.status = DrinkStatus.initial,
       this.error = '',
-      this.drinks = const []});
+      this.drinks = const [],
+      this.dailyWaterLimit = 0,
+      this.drunkWater = 0});
 
   DrinkState copyWith(
-          {DrinkStatus? status, String? error, List<WaterModel>? drinks}) =>
+          {DrinkStatus? status,
+          String? error,
+          List<WaterModel>? drinks,
+          int? dailyWaterLimit,
+          int? drunkWater}) =>
       DrinkState(
           status: status ?? this.status,
           error: error ?? this.error,
-          drinks: drinks ?? this.drinks);
+          drinks: drinks ?? this.drinks,
+          dailyWaterLimit: dailyWaterLimit ?? this.dailyWaterLimit,
+          drunkWater: drunkWater ?? this.drunkWater);
 
   @override
-  List<Object?> get props => [status, error, drinks];
+  List<Object?> get props => [status, error, drinks, dailyWaterLimit, drunkWater];
 }

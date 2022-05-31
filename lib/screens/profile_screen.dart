@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:water_tracker/bloc/auth_bloc/auth_bloc_barrel.dart';
+import 'package:water_tracker/bloc/drinks_bloc/drinks_bloc_barrel.dart';
 import 'package:water_tracker/bloc/user_profile_bloc/user_profile_barrel.dart';
 import 'package:water_tracker/repository/firestore_repository.dart';
 import 'package:water_tracker/repository/storage_repository.dart';
@@ -78,8 +79,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _nameController.text = state.user!.name;
           _dailyLimitController.text = '${state.user!.dailyWaterLimit}';
         }
+        if (state.status == UserProfileStatus.updatedDailyLimit) {
+          context.read<DrinksBloc>().add(LoadDailyLimit());
+        }
+      }, buildWhen: (previousState, currentState) {
+        if (currentState.status == UserProfileStatus.updatedDailyLimit) {
+          return false;
+        } else {
+          return true;
+        }
       }, builder: (context, state) {
-        if (state.status == UserProfileStatus.loading) {
+        if (state.status == UserProfileStatus.initial) {
           return const Center(
             child: CircularProgressIndicator(),
           );
@@ -115,11 +125,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           SizedBox(
             width: 60,
             height: 60,
-            child: state.photoUrl != '' ? CircleAvatar(
-              backgroundImage: NetworkImage(state.photoUrl),
-            ) : CircleAvatar(
-              child: Image.asset('assets/images/account.png'),
-            ),
+            child: state.photoUrl != ''
+                ? CircleAvatar(
+                    backgroundImage: NetworkImage(state.photoUrl),
+                  )
+                : CircleAvatar(
+                    child: Image.asset('assets/images/account.png'),
+                  ),
           ),
           Visibility(
             visible: state.isEdit,
@@ -148,9 +160,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: TextFormField(
               controller: _nameController,
               style: TextStyle(
-                  color: state.isEdit
-                      ? const Color(0xff274a6d)
-                      : Colors.black38),
+                  color:
+                      state.isEdit ? const Color(0xff274a6d) : Colors.black38),
               enabled: state.isEdit,
               decoration: _formDecoration('Name'),
             ),
@@ -158,9 +169,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           TextFormField(
             controller: _dailyLimitController,
             style: TextStyle(
-                color: state.isEdit
-                    ? const Color(0xff274a6d)
-                    : Colors.black38),
+                color: state.isEdit ? const Color(0xff274a6d) : Colors.black38),
             enabled: state.isEdit,
             decoration: _formDecoration('Daily Water Limit'),
           ),
@@ -171,8 +180,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   TextButton(
                     onPressed: () {
                       context.read<UserProfileBloc>().add(SaveChanges(
-                          _nameController.text,
-                          _dailyLimitController.text));
+                          _nameController.text, _dailyLimitController.text));
                     },
                     child: const Text('Save changes'),
                   ),
@@ -195,14 +203,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Container(
         margin: const EdgeInsets.only(top: 60),
         child: TextButton(
-          style: TextButton.styleFrom(
-            backgroundColor: Colors.white,
-            minimumSize: Size(MediaQuery.of(context).size.width, 30),
-          ),
-            onPressed: (){
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.white,
+              minimumSize: Size(MediaQuery.of(context).size.width, 30),
+            ),
+            onPressed: () {
               context.read<AuthBloc>().add(AuthLogOut());
             },
-            child: const Text('Log Out', style: TextStyle(color: Colors.red),)),
+            child: const Text(
+              'Log Out',
+              style: TextStyle(color: Colors.red),
+            )),
       ),
     );
   }

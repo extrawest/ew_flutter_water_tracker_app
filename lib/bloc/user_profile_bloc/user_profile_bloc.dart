@@ -24,7 +24,7 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
   Future<void> _onLoadUserProfile(
       LoadUserProfile event, Emitter<UserProfileState> emit) async {
     try {
-      emit(state.copyWith(status: UserProfileStatus.loading));
+      emit(state.copyWith(status: UserProfileStatus.initial));
       final user = await firestoreRepository.getUser();
       return emit(state.copyWith(
           user: user, photoUrl: '', status: UserProfileStatus.success));
@@ -58,6 +58,7 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
     }
     if (limit != user.dailyWaterLimit) {
       await firestoreRepository.updateDailyLimit(limit);
+      emit(state.copyWith(status: UserProfileStatus.updatedDailyLimit));
     }
 
     final newUser = await firestoreRepository.getUser();
