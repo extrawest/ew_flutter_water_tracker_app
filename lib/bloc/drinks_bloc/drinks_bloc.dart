@@ -6,18 +6,21 @@ import 'package:water_tracker/common/extensions/datetime_to_milliseconds_to_stri
 import 'package:water_tracker/models/water_model.dart';
 import 'package:water_tracker/repository/firestore_repository.dart';
 import 'package:water_tracker/services/firebase/crashlytics_service.dart';
+import 'package:water_tracker/services/firebase/remote_config_service.dart';
 
 class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
   final FirestoreRepository repository;
   final CrashlyticsService crashlyticsService;
+  final RemoteConfigService remoteConfigService;
 
-  DrinksBloc(this.repository, this.crashlyticsService)
+  DrinksBloc({required this.repository, required this.crashlyticsService, required this.remoteConfigService})
       : super(const DrinkState()) {
     on<AddDrink>(_onAddDrink);
     on<DeleteDrink>(_onDeleteDrink);
     on<DrinksOverviewSubscriptionRequested>(_onSubscriptionRequested);
     on<LoadDailyLimit>(_onLoadDailyLimit);
     on<CountOverall>(_onCountOverall);
+    on<FetchIndicatorType>(_onFetchIndicatorType);
   }
 
   Future<void> _onSubscriptionRequested(
@@ -58,8 +61,7 @@ class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
     }
   }
 
-  void _onCountOverall(
-      CountOverall event, Emitter<DrinkState> emit) {
+  void _onCountOverall(CountOverall event, Emitter<DrinkState> emit) {
     int drunkWater = 0;
     final drinks = state.drinks;
     for (final i in drinks) {
@@ -79,5 +81,11 @@ class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
       crashlyticsService.recError(err.toString());
       emit(state.copyWith(status: DrinkStatus.failure, error: err.toString()));
     }
+  }
+
+  Future<void> _onFetchIndicatorType(
+      FetchIndicatorType event, Emitter<DrinkState> emit) async {
+    final indicatorType = remoteConfigService.getRemoteConfig.getString('progress_indicator_type');
+    emit(state.copyWith(progressType: indicatorType));
   }
 }

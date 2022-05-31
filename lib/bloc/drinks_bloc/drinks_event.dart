@@ -42,3 +42,5 @@ class DeleteDrink extends DrinksEvent {
 class CountOverall extends DrinksEvent {}
 
 class LoadDailyLimit extends DrinksEvent {}
+
+class FetchIndicatorType extends DrinksEvent {}

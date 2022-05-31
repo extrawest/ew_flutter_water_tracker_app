@@ -45,6 +45,10 @@ class DrinksList extends StatelessWidget {
               onPressed: (){
                 context.read<HomeCubit>().setTab(HomeTab.progress);
               },
+              style: ButtonStyle(
+                shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0))),
+              ),
               child: const Text('Overall volume'),
             ),
           ],

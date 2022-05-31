@@ -8,6 +8,7 @@ import 'package:water_tracker/repository/firestore_repository.dart';
 import 'package:water_tracker/routes.dart';
 import 'package:water_tracker/screens/profile_screen.dart';
 import 'package:water_tracker/services/firebase/crashlytics_service.dart';
+import 'package:water_tracker/services/firebase/remote_config_service.dart';
 import 'package:water_tracker/widgets/add_water_button.dart';
 import 'package:water_tracker/widgets/drinks_list.dart';
 import 'package:water_tracker/widgets/drinks_overall.dart';
@@ -28,9 +29,12 @@ class HomeScreenWrapper extends StatelessWidget {
         ),
         BlocProvider<DrinksBloc>(
           create: (context) => DrinksBloc(
-              context.read<FirestoreRepositoryImpl>(),
-              context.read<CrashlyticsService>())
-            ..add(LoadDailyLimit()),
+            repository: context.read<FirestoreRepositoryImpl>(),
+            crashlyticsService: context.read<CrashlyticsService>(),
+            remoteConfigService: context.read<RemoteConfigService>(),
+          )
+            ..add(LoadDailyLimit())
+            ..add(FetchIndicatorType()),
         ),
       ],
       child: const HomeScreen(),

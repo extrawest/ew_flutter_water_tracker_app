@@ -11,6 +11,7 @@ import 'package:water_tracker/services/firebase/analytics_service.dart';
 import 'package:water_tracker/services/firebase/crashlytics_service.dart';
 import 'package:water_tracker/services/firebase/firebase_authentication.dart';
 import 'package:water_tracker/services/firebase/firestore.dart';
+import 'package:water_tracker/services/firebase/remote_config_service.dart';
 import 'package:water_tracker/services/firebase/storage_service.dart';
 import 'package:water_tracker/view_models/theme_view_model.dart';
 
@@ -41,13 +42,14 @@ class _ApplicationState extends State<Application> {
                   authService: _authService,
                   firestoreRepository: _firestoreRepository,
                   crashlyticsService: _crashlyticsService)),
-          Provider<FirestoreRepositoryImpl>(
+          RepositoryProvider<FirestoreRepositoryImpl>(
             create: (context) => _firestoreRepository,
           ),
           Provider<StorageRepositoryImpl>(
             create: (context) => _storageRepository,
           ),
           Provider<CrashlyticsService>(create: (context) => _crashlyticsService,),
+          Provider<RemoteConfigService>(create: (context) => RemoteConfigService(),)
         ],
         child: Consumer<ThemeViewModel>(builder: (context, themeViewModel, _) {
           return MaterialApp(
