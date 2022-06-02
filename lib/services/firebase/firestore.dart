@@ -43,6 +43,15 @@ class FirestoreDatabase {
     }
   }
 
+  Future<void> setUserToken(String token) async {
+    final String uid = FirebaseAuth.instance.currentUser!.uid;
+    try{
+      await usersCollection.doc(uid).update({'fcmToken': token});
+    } catch(e) {
+      rethrow;
+    }
+  }
+
   Future<int> getDailyLimit() async {
     final String uid = FirebaseAuth.instance.currentUser!.uid;
     try {

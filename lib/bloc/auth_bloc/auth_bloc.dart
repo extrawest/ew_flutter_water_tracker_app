@@ -25,6 +25,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       emit(state.copyWith(status: AuthStatus.loading));
       await authService.signInWithEmailAndPassword(event.email, event.password);
+      await firestoreRepository.setFcmToken();
       return emit(state.copyWith(status: AuthStatus.signedIn));
     } catch (err) {
       crashlyticsService.recError(err.toString());
@@ -43,6 +44,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           dailyWaterLimit: 3000,
           id: authService.firebaseAuth.currentUser!.uid);
       _addUserToFirestore(user);
+      await firestoreRepository.setFcmToken();
       return emit(state.copyWith(status: AuthStatus.signedIn));
     } catch (err) {
       crashlyticsService.recError(err.toString());
@@ -61,6 +63,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           id: authService.firebaseAuth.currentUser!.uid);
       _addUserToFirestore(user);
 
+      await firestoreRepository.setFcmToken();
       return emit(state.copyWith(status: AuthStatus.signedIn));
     } catch (err) {
       crashlyticsService.recError(err.toString());
@@ -77,6 +80,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           name: '',
           dailyWaterLimit: 3000,
           id: authService.firebaseAuth.currentUser!.uid);
+      await firestoreRepository.setFcmToken();
       _addUserToFirestore(user);
 
       return emit(state.copyWith(status: AuthStatus.signedIn));
@@ -89,6 +93,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onAuthLogOut(AuthLogOut event, Emitter<AuthState> emit) async {
     try {
       await authService.logOut();
+      await firestoreRepository.setFcmToken();
       return emit(state.copyWith(status: AuthStatus.signedOut));
     } catch (err) {
       crashlyticsService.recError(err.toString());
