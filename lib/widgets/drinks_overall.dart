@@ -21,7 +21,7 @@ class _DrinksOverallState extends State<DrinksOverall> {
           children: [
             Expanded(
               flex: 10,
-              child: state.progressType == 'circle'
+              child: state.progressType == 'circular'
                   ? _circleIndicator(state)
                   : _linearIndicator(state),
             ),

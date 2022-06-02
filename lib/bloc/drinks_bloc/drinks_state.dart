@@ -36,5 +36,5 @@ class DrinkState extends Equatable {
 
   @override
   List<Object?> get props =>
-      [status, error, drinks, dailyWaterLimit, drunkWater];
+      [status, error, drinks, dailyWaterLimit, drunkWater, progressType];
 }
