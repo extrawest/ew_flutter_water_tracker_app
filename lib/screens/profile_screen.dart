@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:water_tracker/bloc/auth_bloc/auth_bloc_barrel.dart';
-import 'package:water_tracker/bloc/drinks_bloc/drinks_bloc_barrel.dart';
 import 'package:water_tracker/bloc/user_profile_bloc/user_profile_barrel.dart';
 import 'package:water_tracker/repository/firestore_repository.dart';
 import 'package:water_tracker/repository/storage_repository.dart';
@@ -60,7 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           icon: const Icon(Icons.arrow_left_rounded),
           color: Colors.black45,
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pop(context, context.read<UserProfileBloc>().state.user?.dailyWaterLimit);
           },
           splashRadius: 15,
         ),
@@ -78,9 +77,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (state.status == UserProfileStatus.success) {
           _nameController.text = state.user!.name;
           _dailyLimitController.text = '${state.user!.dailyWaterLimit}';
-        }
-        if (state.status == UserProfileStatus.updatedDailyLimit) {
-          context.read<DrinksBloc>().add(LoadDailyLimit());
         }
       }, buildWhen: (previousState, currentState) {
         if (currentState.status == UserProfileStatus.updatedDailyLimit) {

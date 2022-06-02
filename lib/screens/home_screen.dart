@@ -6,7 +6,7 @@ import 'package:water_tracker/bloc/drinks_bloc/drinks_bloc_barrel.dart';
 import 'package:water_tracker/bloc/home_cubit/home_cubit.dart';
 import 'package:water_tracker/repository/firestore_repository.dart';
 import 'package:water_tracker/routes.dart';
-import 'package:water_tracker/screens/profile_screen.dart';
+import 'package:water_tracker/services/firebase/cloud_messaging_service.dart';
 import 'package:water_tracker/services/firebase/crashlytics_service.dart';
 import 'package:water_tracker/services/firebase/remote_config_service.dart';
 import 'package:water_tracker/widgets/add_water_button.dart';
@@ -50,6 +50,17 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    context.read<CloudMessagingService>().subscribeTopic('reminders');
+    context.read<CloudMessagingService>().fcmInstance.getInitialMessage().then((message) {
+      if (message != null) {
+        Navigator.pushNamed(context, profileScreenRoute);
+      }
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -156,6 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _bottomBar() {
+    final drinksProvider = context.read<DrinksBloc>();
     return Builder(builder: (context) {
       return Padding(
         padding: const EdgeInsets.only(bottom: 8.0),
@@ -180,13 +192,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   IconButton(
                     icon: const Icon(Icons.account_circle_outlined),
                     onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => BlocProvider<DrinksBloc>.value(
-                                    value: context.read<DrinksBloc>(),
-                                    child: const ProfileScreenWrapper(),
-                                  )));
+                      final oldDailyLimit =
+                          drinksProvider.state.dailyWaterLimit;
+                      Navigator.pushNamed(context, profileScreenRoute)
+                          .then((dailyLimit) {
+                        if (dailyLimit == null || dailyLimit == oldDailyLimit) {
+                          return;
+                        } else {
+                          drinksProvider.add(LoadDailyLimit());
+                        }
+                      });
+                      // MaterialPageRoute(
+                      //     builder: (_) => BlocProvider<DrinksBloc>.value(
+                      //           value: context.read<DrinksBloc>(),
+                      //           child: const ProfileScreenWrapper(),
+                      //         )));
                     },
                   ),
                 ],
