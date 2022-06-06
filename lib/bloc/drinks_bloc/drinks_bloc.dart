@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:water_tracker/bloc/drinks_bloc/drinks_bloc_barrel.dart';
+import 'package:water_tracker/bloc/drinks_bloc/drinks_state.dart';
 import 'package:water_tracker/common/extensions/datetime_to_milliseconds_to_string.dart';
 
 import 'package:water_tracker/models/water_model.dart';
@@ -26,6 +27,7 @@ class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
   Future<void> _onSubscriptionRequested(
       DrinksOverviewSubscriptionRequested event,
       Emitter<DrinkState> emit) async {
+    emit(state.copyWith(status: DrinkStatus.loading));
     final String date = event.date.toMillisecondsString();
 
     await emit.forEach(repository.getDayDoc(date),
@@ -37,6 +39,7 @@ class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
       crashlyticsService.recError('failed to subscribe on day document');
       return state.copyWith(status: DrinkStatus.failure);
     });
+
   }
 
   Future<void> _onAddDrink(AddDrink event, Emitter<DrinkState> emit) async {

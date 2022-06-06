@@ -53,13 +53,14 @@ class _DrinksOverallState extends State<DrinksOverall> {
   }
 
   Widget _linearIndicator(DrinkState state) {
+    final double result = state.drunkWater / state.dailyWaterLimit;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         LinearPercentIndicator(
           percent: state.dailyWaterLimit == 0
               ? 0
-              : state.drunkWater / state.dailyWaterLimit,
+              : (result > 1 ? 1 : result),
           barRadius: const Radius.circular(16),
           lineHeight: 30.0,
           animation: true,
@@ -83,12 +84,13 @@ class _DrinksOverallState extends State<DrinksOverall> {
   }
 
   Widget _circleIndicator(DrinkState state) {
+    final double result = state.drunkWater / state.dailyWaterLimit;
     return CircularPercentIndicator(
       radius: 150.0,
       lineWidth: 35,
       percent: state.dailyWaterLimit == 0
           ? 0
-          : state.drunkWater / state.dailyWaterLimit,
+          : (result > 1 ? 1 : result),
       animation: true,
       backgroundWidth: 45,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
