@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:water_tracker/bloc/auth_bloc/auth_bloc_barrel.dart';
 import 'package:water_tracker/bloc/date_picker_bloc/date_picker_bloc_barrel.dart';
 import 'package:water_tracker/bloc/drinks_bloc/drinks_bloc_barrel.dart';
+import 'package:water_tracker/bloc/dynamic_link_bloc/dynamic_link_barrel.dart';
 import 'package:water_tracker/bloc/home_cubit/home_cubit.dart';
 import 'package:water_tracker/repository/firestore_repository.dart';
 import 'package:water_tracker/routes.dart';
@@ -52,8 +54,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
+    context.read<DynamicLinkBloc>().add(RequestSubscription());
     context.read<CloudMessagingService>().subscribeTopic('reminders');
-    context.read<CloudMessagingService>().fcmInstance.getInitialMessage().then((message) {
+    context
+        .read<CloudMessagingService>()
+        .fcmInstance
+        .getInitialMessage()
+        .then((message) {
       if (message != null) {
         Navigator.pushNamed(context, profileScreenRoute);
       }
@@ -71,16 +78,26 @@ class _HomeScreenState extends State<HomeScreen> {
                 context, loginScreenRoute, (route) => false);
           }
         },
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              _dateSelect(),
-              Expanded(flex: 4, child: _body()),
-              _bottomBar(),
-            ],
-          ),
-        ),
+        child: BlocBuilder<DynamicLinkBloc, DynamicLinkState>(
+            builder: (context, state) {
+          if (state.linkParameter != null) {
+            SchedulerBinding.instance!.addPostFrameCallback((timeStamp) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('I drunk ${state.linkParameter} milliliters')));
+              context.read<DynamicLinkBloc>().add(DropLink());
+            });
+          }
+          return SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                _dateSelect(),
+                Expanded(flex: 4, child: _body()),
+                _bottomBar(),
+              ],
+            ),
+          );
+        }),
       ),
     );
   }
@@ -194,7 +211,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () {
                       final oldDailyLimit =
                           drinksProvider.state.dailyWaterLimit;
-                      Navigator.pushNamed(context, profileScreenRoute)
+                      Navigator.pushNamed(context, profileScreenRoute,
+                              arguments: drinksProvider.state.drunkWater)
                           .then((dailyLimit) {
                         if (dailyLimit == null || dailyLimit == oldDailyLimit) {
                           return;

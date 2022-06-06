@@ -48,6 +48,8 @@ dependencies:
   firebase_remote_config: ^2.0.8
   percent_indicator: 4.0.1
   firebase_messaging: ^11.4.1
+  firebase_dynamic_links: ^4.2.5
+  share_plus: ^4.0.6
 
 
 dev_dependencies:

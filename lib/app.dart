@@ -4,12 +4,14 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:provider/provider.dart';
 import 'package:water_tracker/bloc/auth_bloc/auth_bloc.dart';
+import 'package:water_tracker/bloc/dynamic_link_bloc/dynamic_link_barrel.dart';
 import 'package:water_tracker/repository/firestore_repository.dart';
 import 'package:water_tracker/repository/storage_repository.dart';
 import 'package:water_tracker/routes.dart';
 import 'package:water_tracker/services/firebase/analytics_service.dart';
 import 'package:water_tracker/services/firebase/cloud_messaging_service.dart';
 import 'package:water_tracker/services/firebase/crashlytics_service.dart';
+import 'package:water_tracker/services/firebase/dynamic_links_service.dart';
 import 'package:water_tracker/services/firebase/firebase_authentication.dart';
 import 'package:water_tracker/services/firebase/firestore.dart';
 import 'package:water_tracker/services/firebase/remote_config_service.dart';
@@ -47,6 +49,7 @@ class _ApplicationState extends State<Application> {
                   authService: _authService,
                   firestoreRepository: _firestoreRepository,
                   crashlyticsService: _crashlyticsService)),
+          BlocProvider<DynamicLinkBloc>(create: (context) => DynamicLinkBloc(DynamicLinksService())),
           RepositoryProvider<FirestoreRepositoryImpl>(
             create: (context) => _firestoreRepository,
           ),

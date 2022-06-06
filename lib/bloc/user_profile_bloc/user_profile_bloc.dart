@@ -5,14 +5,19 @@ import 'package:water_tracker/bloc/user_profile_bloc/user_profile_state.dart';
 import 'package:water_tracker/repository/firestore_repository.dart';
 import 'package:water_tracker/repository/storage_repository.dart';
 import 'package:water_tracker/services/firebase/crashlytics_service.dart';
+import 'package:water_tracker/services/firebase/dynamic_links_service.dart';
 
 class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
   final FirestoreRepository firestoreRepository;
   final StorageRepository storageRepository;
   final CrashlyticsService crashlyticsService;
+  final DynamicLinksService dynamicLinksService = DynamicLinksService();
   final imagePicker = ImagePicker();
 
-  UserProfileBloc({required this.firestoreRepository, required this.storageRepository, required this.crashlyticsService})
+  UserProfileBloc(
+      {required this.firestoreRepository,
+      required this.storageRepository,
+      required this.crashlyticsService})
       : super(const UserProfileState()) {
     on<LoadUserProfile>(_onLoadUserProfile);
     on<LoadUserPhoto>(_onLoadUserPhoto);

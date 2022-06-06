@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:water_tracker/bloc/auth_bloc/auth_bloc_barrel.dart';
+import 'package:water_tracker/bloc/dynamic_link_bloc/dynamic_link_barrel.dart';
 import 'package:water_tracker/bloc/user_profile_bloc/user_profile_barrel.dart';
 import 'package:water_tracker/repository/firestore_repository.dart';
 import 'package:water_tracker/repository/storage_repository.dart';
@@ -59,7 +60,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           icon: const Icon(Icons.arrow_left_rounded),
           color: Colors.black45,
           onPressed: () {
-            Navigator.pop(context, context.read<UserProfileBloc>().state.user?.dailyWaterLimit);
+            Navigator.pop(context,
+                context.read<UserProfileBloc>().state.user?.dailyWaterLimit);
           },
           splashRadius: 15,
         ),
@@ -147,6 +149,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _form(BuildContext context, UserProfileState state) {
+    final sumOfMilliliters = ModalRoute.of(context)!.settings.arguments as int;
     return Form(
       key: _formKey,
       child: Column(
@@ -168,6 +171,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: state.isEdit ? const Color(0xff274a6d) : Colors.black38),
             enabled: state.isEdit,
             decoration: _formDecoration('Daily Water Limit'),
+          ),
+          Visibility(
+            visible: !state.isEdit,
+            child: TextButton(
+              onPressed: () {
+                context.read<DynamicLinkBloc>().add(ShareDynamicLink(sumOfMilliliters));
+              },
+              child: const Text('Share my result'),
+            ),
           ),
           Visibility(
               visible: state.isEdit,
