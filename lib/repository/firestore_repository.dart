@@ -6,6 +6,8 @@ import 'package:water_tracker/models/water_model.dart';
 import 'package:water_tracker/services/firebase/cloud_messaging_service.dart';
 import 'package:water_tracker/services/firebase/firestore.dart';
 
+import '../services/firebase/analytics_service.dart';
+
 abstract class FirestoreRepository {
   Future<void> addUser(UserModel model);
 
@@ -29,9 +31,10 @@ abstract class FirestoreRepository {
 class FirestoreRepositoryImpl implements FirestoreRepository {
   final FirestoreDatabase firestoreDatabase;
   final CloudMessagingService cloudMessagingService;
+  final AnalyticsService analyticsService;
 
   FirestoreRepositoryImpl(
-      {required this.firestoreDatabase, required this.cloudMessagingService});
+      {required this.firestoreDatabase, required this.cloudMessagingService, required this.analyticsService});
 
   @override
   Future<void> addUser(UserModel model) async {
@@ -41,6 +44,7 @@ class FirestoreRepositoryImpl implements FirestoreRepository {
   @override
   Future<void> addWater(WaterModel waterModel, String date) async {
     await firestoreDatabase.addWater(waterModel, date);
+    analyticsService.addWaterEvent(waterModel.amount);
   }
 
   @override
@@ -51,6 +55,7 @@ class FirestoreRepositoryImpl implements FirestoreRepository {
   @override
   Future<void> updateUsername(String name) async {
     await firestoreDatabase.updateUsername(name);
+    await analyticsService.nameUpdatedEvent(name);
   }
 
   @override

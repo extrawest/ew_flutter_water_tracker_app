@@ -2,15 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:water_tracker/models/user_model.dart';
 import 'package:water_tracker/models/water_model.dart';
-import 'package:water_tracker/services/firebase/analytics_service.dart';
 
 class FirestoreDatabase {
-  final AnalyticsService analyticsService;
-
   final CollectionReference usersCollection =
       FirebaseFirestore.instance.collection('users');
-
-  FirestoreDatabase(this.analyticsService);
 
   Future<void> addUser(UserModel model) async {
     /// We need to check if user has already existed in firestore
@@ -37,7 +32,6 @@ class FirestoreDatabase {
     final String uid = FirebaseAuth.instance.currentUser!.uid;
     try {
       await usersCollection.doc(uid).update({'name': name});
-      await analyticsService.nameUpdatedEvent(name);
     } catch (e) {
       rethrow;
     }
@@ -83,7 +77,6 @@ class FirestoreDatabase {
       await _daysCollection.doc(date).set({
         'water': FieldValue.arrayUnion([waterModel.toJson()])
       }, SetOptions(merge: true));
-      analyticsService.addWaterEvent(waterModel.amount);
     } catch (e) {
       rethrow;
     }

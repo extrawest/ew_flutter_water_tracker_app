@@ -31,13 +31,14 @@ class _ApplicationState extends State<Application> {
     final _analyticsService = AnalyticsService();
     final _crashlyticsService = CrashlyticsService()
       ..listenAuthState(_authService);
-    final _firestoreDatabase = FirestoreDatabase(_analyticsService);
+    final _firestoreDatabase = FirestoreDatabase();
     final _cloudMessagingService = CloudMessagingService();
     final _firestoreRepository = FirestoreRepositoryImpl(
         firestoreDatabase: _firestoreDatabase,
-        cloudMessagingService: _cloudMessagingService);
-    final _storageRepository =
-        StorageRepositoryImpl(StorageService(_analyticsService));
+        cloudMessagingService: _cloudMessagingService,
+        analyticsService: _analyticsService);
+    final _storageRepository = StorageRepositoryImpl(
+        storageService: StorageService(), analyticsService: _analyticsService);
 
     return LocalizationProvider(
       state: LocalizationProvider.of(context).state,
@@ -49,7 +50,8 @@ class _ApplicationState extends State<Application> {
                   authService: _authService,
                   firestoreRepository: _firestoreRepository,
                   crashlyticsService: _crashlyticsService)),
-          BlocProvider<DynamicLinkBloc>(create: (context) => DynamicLinkBloc(DynamicLinksService())),
+          BlocProvider<DynamicLinkBloc>(
+              create: (context) => DynamicLinkBloc(DynamicLinksService())),
           RepositoryProvider<FirestoreRepositoryImpl>(
             create: (context) => _firestoreRepository,
           ),

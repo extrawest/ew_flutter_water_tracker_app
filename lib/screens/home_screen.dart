@@ -201,9 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.stacked_bar_chart),
-                    onPressed: () {
-                      throw Exception();
-                    },
+                    onPressed: () {},
                   ),
                   const SizedBox(),
                   IconButton(
