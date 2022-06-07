@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:water_tracker/models/user_model.dart';
 import 'package:water_tracker/models/water_model.dart';
 import 'package:water_tracker/services/firebase/cloud_messaging_service.dart';
@@ -32,6 +33,9 @@ class FirestoreRepositoryImpl implements FirestoreRepository {
   final FirestoreDatabase firestoreDatabase;
   final CloudMessagingService cloudMessagingService;
   final AnalyticsService analyticsService;
+
+  //final CollectionReference usersCollection = FirebaseFirestore.instance.collection('users');
+  //final DocumentReference userDoc = FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid);
 
   FirestoreRepositoryImpl(
       {required this.firestoreDatabase, required this.cloudMessagingService, required this.analyticsService});
