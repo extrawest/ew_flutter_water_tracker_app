@@ -27,8 +27,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await authService.signInWithEmailAndPassword(event.email, event.password);
       await firestoreRepository.setFcmToken();
       return emit(state.copyWith(status: AuthStatus.signedIn));
-    } catch (err) {
-      crashlyticsService.recError(err.toString());
+    } catch (err, trace) {
+      crashlyticsService.recError(err.toString(), trace, reason: 'Email sign In error for ${event.email}');
       emit(state.copyWith(status: AuthStatus.failure, error: err.toString()));
     }
   }
@@ -46,8 +46,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       _addUserToFirestore(user);
       await firestoreRepository.setFcmToken();
       return emit(state.copyWith(status: AuthStatus.signedIn));
-    } catch (err) {
-      crashlyticsService.recError(err.toString());
+    } catch (err, trace) {
+      crashlyticsService.recError(err.toString(), trace, reason: 'Register error for ${event.email}');
       emit(state.copyWith(status: AuthStatus.failure, error: err.toString()));
     }
   }
@@ -65,8 +65,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       await firestoreRepository.setFcmToken();
       return emit(state.copyWith(status: AuthStatus.signedIn));
-    } catch (err) {
-      crashlyticsService.recError(err.toString());
+    } catch (err, trace) {
+      crashlyticsService.recError(err.toString(), trace, reason: 'Google sign In error');
       emit(state.copyWith(status: AuthStatus.failure, error: err.toString()));
     }
   }
@@ -84,8 +84,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       _addUserToFirestore(user);
 
       return emit(state.copyWith(status: AuthStatus.signedIn));
-    } catch (err) {
-      crashlyticsService.recError(err.toString());
+    } catch (err, trace) {
+      crashlyticsService.recError(err.toString(), trace, reason: 'Facebook sign In error');
       emit(state.copyWith(status: AuthStatus.failure, error: err.toString()));
     }
   }
@@ -95,8 +95,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await authService.logOut();
       await firestoreRepository.setFcmToken();
       return emit(state.copyWith(status: AuthStatus.signedOut));
-    } catch (err) {
-      crashlyticsService.recError(err.toString());
+    } catch (err, trace) {
+      crashlyticsService.recError(err.toString(), trace, reason: 'Log Out error');
       emit(state.copyWith(error: err.toString()));
     }
   }

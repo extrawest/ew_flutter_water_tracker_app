@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:water_tracker/bloc/drinks_bloc/drinks_bloc_barrel.dart';
-import 'package:water_tracker/bloc/drinks_bloc/drinks_state.dart';
 import 'package:water_tracker/common/extensions/datetime_to_milliseconds_to_string.dart';
 
 import 'package:water_tracker/models/water_model.dart';
@@ -14,7 +13,10 @@ class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
   final CrashlyticsService crashlyticsService;
   final RemoteConfigService remoteConfigService;
 
-  DrinksBloc({required this.repository, required this.crashlyticsService, required this.remoteConfigService})
+  DrinksBloc(
+      {required this.repository,
+      required this.crashlyticsService,
+      required this.remoteConfigService})
       : super(const DrinkState()) {
     on<AddDrink>(_onAddDrink);
     on<DeleteDrink>(_onDeleteDrink);
@@ -35,20 +37,23 @@ class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
       final List<WaterModel>? waters = water.data();
       add(CountOverall());
       return state.copyWith(status: DrinkStatus.success, drinks: waters ?? []);
-    }, onError: (_, __) {
-      crashlyticsService.recError('failed to subscribe on day document');
+    }, onError: (err, trace) {
+      crashlyticsService.recError(err.toString(), trace,
+          reason:
+              'Error on subscribing on a document ${event.date.toMillisecondsString()}');
       return state.copyWith(status: DrinkStatus.failure);
     });
-
   }
 
   Future<void> _onAddDrink(AddDrink event, Emitter<DrinkState> emit) async {
+    final WaterModel waterModel =
+        WaterModel(amount: event.amount, time: event.time, type: event.type);
     try {
-      final WaterModel waterModel =
-          WaterModel(amount: event.amount, time: event.time, type: event.type);
       await repository.addWater(waterModel, event.date.toMillisecondsString());
-    } catch (err) {
-      crashlyticsService.recError(err.toString());
+    } catch (err, trace) {
+      crashlyticsService.recError(err.toString(), trace,
+          reason:
+              'Failed to add drink to firestore ${waterModel.toString()} on ${event.date.toMillisecondsString()}');
       emit(state.copyWith(status: DrinkStatus.failure, error: err.toString()));
     }
   }
@@ -58,8 +63,9 @@ class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
     try {
       await repository.deleteWater(
           event.model, event.date.toMillisecondsString());
-    } catch (err) {
-      crashlyticsService.recError(err.toString());
+    } catch (err, trace) {
+      crashlyticsService.recError(err.toString(), trace,
+          reason: 'Error deleting drink ${event.model.toString()}');
       emit(state.copyWith(status: DrinkStatus.failure, error: err.toString()));
     }
   }
@@ -80,15 +86,17 @@ class DrinksBloc extends Bloc<DrinksEvent, DrinkState> {
       final dailyLimit = await repository.getDailyLimit();
       emit(state.copyWith(
           dailyWaterLimit: dailyLimit, status: DrinkStatus.success));
-    } catch (err) {
-      crashlyticsService.recError(err.toString());
+    } catch (err, trace) {
+      crashlyticsService.recError(err.toString(), trace,
+          reason: 'Error loading daily water limit from firestore}');
       emit(state.copyWith(status: DrinkStatus.failure, error: err.toString()));
     }
   }
 
   Future<void> _onFetchIndicatorType(
       FetchIndicatorType event, Emitter<DrinkState> emit) async {
-    final indicatorType = remoteConfigService.getRemoteConfig.getString('progress_indicator_type');
+    final indicatorType = remoteConfigService.getRemoteConfig
+        .getString('progress_indicator_type');
     emit(state.copyWith(progressType: indicatorType));
   }
 }

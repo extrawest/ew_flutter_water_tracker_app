@@ -14,10 +14,9 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
   final DynamicLinksService dynamicLinksService = DynamicLinksService();
   final imagePicker = ImagePicker();
 
-  UserProfileBloc(
-      {required this.firestoreRepository,
-      required this.storageRepository,
-      required this.crashlyticsService})
+  UserProfileBloc({required this.firestoreRepository,
+    required this.storageRepository,
+    required this.crashlyticsService})
       : super(const UserProfileState()) {
     on<LoadUserProfile>(_onLoadUserProfile);
     on<LoadUserPhoto>(_onLoadUserPhoto);
@@ -26,49 +25,59 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
     on<SaveChanges>(_onSaveChanges);
   }
 
-  Future<void> _onLoadUserProfile(
-      LoadUserProfile event, Emitter<UserProfileState> emit) async {
+  Future<void> _onLoadUserProfile(LoadUserProfile event,
+      Emitter<UserProfileState> emit) async {
     try {
       emit(state.copyWith(status: UserProfileStatus.initial));
       final user = await firestoreRepository.getUser();
       return emit(state.copyWith(
           user: user, photoUrl: '', status: UserProfileStatus.success));
-    } catch (e) {
-      crashlyticsService.recError(e.toString());
+    } catch (e, trace) {
+      crashlyticsService.recError(e.toString(), trace,
+          reason: 'Failed to load user profile from firestore');
       emit(state.copyWith(status: UserProfileStatus.failure));
     }
   }
 
-  Future<void> _onLoadUserPhoto(
-      LoadUserPhoto event, Emitter<UserProfileState> emit) async {
+  Future<void> _onLoadUserPhoto(LoadUserPhoto event,
+      Emitter<UserProfileState> emit) async {
     try {
       final photoUrl = await storageRepository.getPhotoUrl();
       return emit(state.copyWith(photoUrl: photoUrl));
-    } catch (e) {
+    } catch (e, trace) {
+      crashlyticsService.recError(e.toString(), trace,
+          reason: 'Failed to load user photo from storage');
       return emit(state.copyWith(photoUrl: ''));
     }
   }
 
-  Future<void> _onSaveChanges(
-      SaveChanges event, Emitter<UserProfileState> emit) async {
-    final user = state.user!;
-    final int limit = int.parse(event.dailyWaterLimit);
+  Future<void> _onSaveChanges(SaveChanges event,
+      Emitter<UserProfileState> emit) async {
+    try {
+      final user = state.user!;
+      final int limit = int.parse(event.dailyWaterLimit);
 
-    if (event.name == user.name && limit == user.dailyWaterLimit) {
-      return emit(state.copyWith(isEdit: false));
-    }
-    emit(state.copyWith(status: UserProfileStatus.updating));
-    if (event.name != user.name) {
-      await firestoreRepository.updateUsername(event.name);
-    }
-    if (limit != user.dailyWaterLimit) {
-      await firestoreRepository.updateDailyLimit(limit);
-      emit(state.copyWith(status: UserProfileStatus.updatedDailyLimit));
-    }
+      if (event.name == user.name && limit == user.dailyWaterLimit) {
+        return emit(state.copyWith(isEdit: false));
+      }
+      emit(state.copyWith(status: UserProfileStatus.updating));
+      if (event.name != user.name) {
+        await firestoreRepository.updateUsername(event.name);
+      }
+      if (limit != user.dailyWaterLimit) {
+        await firestoreRepository.updateDailyLimit(limit);
+        emit(state.copyWith(status: UserProfileStatus.updatedDailyLimit));
+      }
 
-    final newUser = await firestoreRepository.getUser();
-    return emit(state.copyWith(
-        user: newUser, status: UserProfileStatus.success, isEdit: false));
+      final newUser = await firestoreRepository.getUser();
+      return emit(state.copyWith(
+          user: newUser, status: UserProfileStatus.success, isEdit: false));
+    } catch (e, trace) {
+      crashlyticsService.recError(e.toString(), trace,
+          reason: 'Failed to update user profile info with: Name: ${event
+              .name}, Daily Water limit${event.dailyWaterLimit}');
+      return emit(state.copyWith(status: UserProfileStatus.failure));
+    }
   }
 
   void _onCheckEdit(CheckEdit event, Emitter<UserProfileState> emit) {
@@ -77,10 +86,10 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
     }
   }
 
-  Future<void> _onPickPhotoFromGallery(
-      PickPhotoFromGallery event, Emitter<UserProfileState> emit) async {
+  Future<void> _onPickPhotoFromGallery(PickPhotoFromGallery event,
+      Emitter<UserProfileState> emit) async {
     final XFile? image =
-        await imagePicker.pickImage(source: ImageSource.gallery);
+    await imagePicker.pickImage(source: ImageSource.gallery);
     if (image == null) {
       return;
     }

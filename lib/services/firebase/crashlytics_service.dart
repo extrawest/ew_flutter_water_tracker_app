@@ -17,7 +17,7 @@ class CrashlyticsService {
   }
 
 
-  Future<void> recError(String exception) async {
-    await _crashlyticsService.recordError(exception, null);
+  Future<void> recError(String exception, StackTrace trace, {String? reason}) async {
+    await _crashlyticsService.recordError(exception, trace, reason: reason);
   }
 }

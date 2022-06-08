@@ -3,10 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:water_tracker/models/user_model.dart';
 import 'package:water_tracker/models/water_model.dart';
 
-class FirestoreDatabase {
-  final CollectionReference usersCollection =
-      FirebaseFirestore.instance.collection('users');
 
+final CollectionReference usersCollection =
+  FirebaseFirestore.instance.collection('users');
+
+class FirestoreDatabase {
   Future<void> addUser(UserModel model) async {
     /// We need to check if user has already existed in firestore
     /// in cases when we use Google or Facebook Authentication

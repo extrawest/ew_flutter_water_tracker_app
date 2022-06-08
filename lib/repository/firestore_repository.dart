@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:water_tracker/models/user_model.dart';
 import 'package:water_tracker/models/water_model.dart';
 import 'package:water_tracker/services/firebase/cloud_messaging_service.dart';
@@ -74,7 +73,7 @@ class FirestoreRepositoryImpl implements FirestoreRepository {
 
   @override
   Future<void> deleteWater(WaterModel waterModel, String date) async {
-    return await firestoreDatabase.deleteWater(waterModel, date);
+    await firestoreDatabase.deleteWater(waterModel, date);
   }
 
   @override
