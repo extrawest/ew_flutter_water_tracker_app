@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:water_tracker/bloc/dynamic_link_bloc/dynamic_link_barrel.dart';
+import 'package:water_tracker/common/app_constants.dart';
 import 'package:water_tracker/routes.dart';
 import 'package:water_tracker/services/firebase/remote_config_service.dart';
 
@@ -42,7 +43,7 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
             SizedBox(
               width: 100,
-              child: Image.asset('assets/images/drop.png'),
+              child: Image.asset(ImagesPath.DROP_IMAGE),
             ),
           ],
         ),

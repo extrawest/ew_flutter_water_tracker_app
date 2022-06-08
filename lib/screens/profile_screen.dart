@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:water_tracker/bloc/auth_bloc/auth_bloc_barrel.dart';
 import 'package:water_tracker/bloc/dynamic_link_bloc/dynamic_link_barrel.dart';
 import 'package:water_tracker/bloc/user_profile_bloc/user_profile_barrel.dart';
+import 'package:water_tracker/common/app_constants.dart';
 import 'package:water_tracker/repository/firestore_repository.dart';
 import 'package:water_tracker/repository/storage_repository.dart';
 import 'package:water_tracker/services/firebase/crashlytics_service.dart';
@@ -128,7 +129,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     backgroundImage: NetworkImage(state.photoUrl),
                   )
                 : CircleAvatar(
-                    child: Image.asset('assets/images/account.png'),
+                    child: Image.asset(ImagesPath.ACCOUNT_IMAGE),
                   ),
           ),
           Visibility(

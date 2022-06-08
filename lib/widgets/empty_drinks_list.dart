@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:water_tracker/common/app_constants.dart';
 
 class EmptyDrinksList extends StatelessWidget {
   const EmptyDrinksList({Key? key}) : super(key: key);
@@ -8,7 +9,7 @@ class EmptyDrinksList extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Image.asset('assets/images/glass-of-water.png', scale: 2,),
+        Image.asset(ImagesPath.GLASS_OF_WATER_IMAGE, scale: 2,),
         Container(
           height: 100,
           margin: const EdgeInsets.only(left: 70, right: 70),

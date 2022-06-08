@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:water_tracker/bloc/auth_bloc/auth_bloc_barrel.dart';
+import 'package:water_tracker/common/app_constants.dart';
 import 'package:water_tracker/routes.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -139,13 +140,13 @@ class _LoginScreenState extends State<LoginScreen> {
           onPressed: () {
             _loginWithGoogle();
           },
-          icon: Image.asset('assets/images/google.png'),
+          icon: Image.asset(ImagesPath.GOOGLE_IMAGE),
         ),
         IconButton(
           onPressed: () {
             _loginWithFacebook();
           },
-          icon: Image.asset('assets/images/facebook.png'),
+          icon: Image.asset(ImagesPath.FACEBOOK_IMAGE),
         ),
       ],
     );

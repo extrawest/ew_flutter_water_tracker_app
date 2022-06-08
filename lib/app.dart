@@ -24,22 +24,33 @@ class Application extends StatefulWidget {
 }
 
 class _ApplicationState extends State<Application> {
+  late final AuthService _authService;
+  late final AnalyticsService _analyticsService;
+  late final CrashlyticsService _crashlyticsService;
+  late final FirestoreDatabase _firestoreDatabase;
+  late final CloudMessagingService _cloudMessagingService;
+  late final FirestoreRepositoryImpl _firestoreRepository;
+  late final StorageRepositoryImpl _storageRepository;
+
   @override
-  Widget build(BuildContext context) {
-    final localizationDelegate = LocalizedApp.of(context).delegate;
-    final _authService = AuthService();
-    final _analyticsService = AnalyticsService();
-    final _crashlyticsService = CrashlyticsService()
-      ..listenAuthState(_authService);
-    final _firestoreDatabase = FirestoreDatabase();
-    final _cloudMessagingService = CloudMessagingService();
-    final _firestoreRepository = FirestoreRepositoryImpl(
+  void initState() {
+    _authService = AuthService();
+    _analyticsService = AnalyticsService();
+    _crashlyticsService = CrashlyticsService()..listenAuthState(_authService);
+    _firestoreDatabase = FirestoreDatabase();
+    _cloudMessagingService = CloudMessagingService();
+    _firestoreRepository = FirestoreRepositoryImpl(
         firestoreDatabase: _firestoreDatabase,
         cloudMessagingService: _cloudMessagingService,
         analyticsService: _analyticsService);
-    final _storageRepository = StorageRepositoryImpl(
+    _storageRepository = StorageRepositoryImpl(
         storageService: StorageService(), analyticsService: _analyticsService);
+    super.initState();
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    final localizationDelegate = LocalizedApp.of(context).delegate;
     return LocalizationProvider(
       state: LocalizationProvider.of(context).state,
       child: MultiProvider(
@@ -55,16 +66,16 @@ class _ApplicationState extends State<Application> {
           RepositoryProvider<FirestoreRepositoryImpl>(
             create: (context) => _firestoreRepository,
           ),
-          Provider<StorageRepositoryImpl>(
+          RepositoryProvider<StorageRepositoryImpl>(
             create: (context) => _storageRepository,
           ),
-          Provider<CrashlyticsService>(
+          RepositoryProvider<CrashlyticsService>(
             create: (context) => _crashlyticsService,
           ),
-          Provider<RemoteConfigService>(
+          RepositoryProvider<RemoteConfigService>(
             create: (context) => RemoteConfigService(),
           ),
-          Provider<CloudMessagingService>(
+          RepositoryProvider<CloudMessagingService>(
             create: (context) => _cloudMessagingService,
           ),
         ],
