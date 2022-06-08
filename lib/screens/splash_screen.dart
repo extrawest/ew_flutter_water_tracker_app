@@ -7,7 +7,6 @@ import 'package:water_tracker/common/app_constants.dart';
 import 'package:water_tracker/routes.dart';
 import 'package:water_tracker/services/firebase/remote_config_service.dart';
 
-import '../services/firebase/firebase_authentication.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -22,11 +21,9 @@ class _SplashScreenState extends State<SplashScreen> {
     SchedulerBinding.instance!.addPostFrameCallback((timeStamp) async {
       await RemoteConfigService().setupRemoteConfig();
       context.read<DynamicLinkBloc>().add(GetDynamicLink());
-      AuthService().firebaseAuth
-          .authStateChanges().listen((User? user) {
+      final user = FirebaseAuth.instance.currentUser;
         Navigator.pushReplacementNamed(context, user == null ? loginScreenRoute : homeScreenRoute);
       });
-    });
   }
 
   @override
