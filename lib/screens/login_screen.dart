@@ -33,19 +33,26 @@ class _LoginScreenState extends State<LoginScreen> {
           }
         },
         child: Center(
-          child: Column(
-            children: [
-              const Expanded(
-                  flex: 3,
-                  child:
-                      Align(alignment: Alignment.center, child: Text('Sign In'))),
-              Expanded(flex: 4, child: _form()),
-              Text('Or Sign In with:'),
-              Expanded(
-                  flex: 2,
-                  child:
-                      Align(alignment: Alignment.topCenter, child: _otherAuth())),
-            ],
+          child: CustomScrollView(
+            slivers:[
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Column(
+                  children: [
+                    const Expanded(
+                        flex: 3,
+                        child:
+                        Align(alignment: Alignment.center, child: Text('Sign In'))),
+                    Expanded(flex: 4, child: _form()),
+                    const Text('Or Sign In with:'),
+                    Expanded(
+                        flex: 2,
+                        child:
+                        Align(alignment: Alignment.topCenter, child: _otherAuth())),
+                  ],
+                ),
+              ),
+            ] 
           ),
         ),
       ),

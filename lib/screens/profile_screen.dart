@@ -95,12 +95,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         } else {
           return Container(
             margin: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                _userPhoto(context, state),
-                _form(context, state),
-                _logOutButton(context, state),
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  _userPhoto(context, state),
+                  _form(context, state),
+                  _logOutButton(context, state),
+                ],
+              ),
             ),
           );
         }

@@ -15,6 +15,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final GlobalKey<NavigatorState> globalNavigatorKey = GlobalKey<NavigatorState>();
   @override
   void initState() {
     super.initState();

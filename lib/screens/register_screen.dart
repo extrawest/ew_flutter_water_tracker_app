@@ -32,13 +32,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
           }
         },
         child: Center(
-          child: Column(
-            children: [
-              const Expanded(
-                  flex: 1,
-                  child: Align(
-                      alignment: Alignment.center, child: Text('Register'))),
-              Expanded(flex: 5, child: _form()),
+          child: CustomScrollView(
+            slivers: [
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Column(
+                  children: [
+                    const Expanded(
+                        flex: 1,
+                        child: Align(
+                            alignment: Alignment.center, child: Text('Register'))),
+                    Expanded(flex: 5, child: _form()),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
