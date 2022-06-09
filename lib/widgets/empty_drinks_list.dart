@@ -25,7 +25,7 @@ class EmptyDrinksList extends StatelessWidget {
             ],
           ),
         ),
-        const Text('No drinks added today'),
+        Text('No drinks added today', style: Theme.of(context).textTheme.headline6,),
       ],
     );
   }

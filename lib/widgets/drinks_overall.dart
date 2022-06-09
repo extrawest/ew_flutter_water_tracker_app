@@ -4,6 +4,7 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:water_tracker/bloc/drinks_bloc/drinks_bloc_barrel.dart';
 import 'package:water_tracker/bloc/home_cubit/home_cubit.dart';
+import 'package:water_tracker/theme/decorations.dart';
 
 class DrinksOverall extends StatefulWidget {
   const DrinksOverall({Key? key}) : super(key: key);
@@ -26,14 +27,11 @@ class _DrinksOverallState extends State<DrinksOverall> {
                   : _linearIndicator(state),
             ),
             TextButton(
-              style: ButtonStyle(
-                shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30.0))),
-              ),
+              style: textButtonStyle[1],
               onPressed: () {
                 context.read<HomeCubit>().setTab(HomeTab.drinks);
               },
-              child: const Text("Today's drinks"),
+              child: Text("Today's drinks", style: Theme.of(context).textTheme.button,),
             ),
           ],
         ),

@@ -83,8 +83,8 @@ class _HomeScreenState extends State<HomeScreen> {
             builder: (context, state) {
           if (state.linkParameter != null) {
             SchedulerBinding.instance!.addPostFrameCallback((timeStamp) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('I drunk ${state.linkParameter} milliliters')));
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('I drunk ${state.linkParameter} milliliters')));
               context.read<DynamicLinkBloc>().add(DropLink());
             });
           }
@@ -104,9 +104,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _dateSelect() {
+    final theme = Theme.of(context);
     return BlocBuilder<DatePickerBloc, DatePickerState>(
         builder: (context, state) {
       return Container(
+        height: 50,
         margin: const EdgeInsets.all(10.0),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -115,38 +117,51 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_drop_down),
-              onPressed: () {
-                showDatePicker(
-                  context: context,
-                  initialDate: state.date ?? DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2100),
-                ).then((date) {
-                  context
-                      .read<DatePickerBloc>()
-                      .add(DatePickerSelectDate(date!));
-                });
-              },
+            Padding(
+              padding: const EdgeInsets.only(left: 12.0, right: 5),
+              child: _buttonWrapping(
+                  icon: Icon(Icons.arrow_drop_down, color: theme.primaryColor),
+                  onTap: () {
+                    showDatePicker(
+                      context: context,
+                      initialDate: state.date ?? DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2100),
+                    ).then((date) {
+                      context
+                          .read<DatePickerBloc>()
+                          .add(DatePickerSelectDate(date!));
+                    });
+                  }),
             ),
-            Column(
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(state.dayOfWeek, style: Theme.of(context).textTheme.bodyText1,),
+                    Text(state.dateInfo, style: Theme.of(context).textTheme.bodyText1),
+                  ],
+                ),
+              ),
+            ),
+            Row(
               children: [
-                Text(state.dayOfWeek),
-                Text(state.dateInfo),
+                Padding(
+                  padding: const EdgeInsets.only(right: 10.0),
+                  child: _buttonWrapping(icon: Icon(Icons.arrow_left, color: theme.primaryColor), onTap: () {}),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 5.0, bottom: 5.0),
+                  child: VerticalDivider(color: theme.primaryColor,),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10.0, right: 5),
+                  child: _buttonWrapping(icon: Icon(Icons.arrow_right, color: theme.primaryColor), onTap: () {}),
+                ),
               ],
             ),
-            Row(children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_left),
-                onPressed: () {},
-              ),
-              const VerticalDivider(),
-              IconButton(
-                icon: const Icon(Icons.arrow_right),
-                onPressed: () {},
-              ),
-            ]),
           ],
         ),
       );
@@ -193,6 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Container(
               margin: const EdgeInsets.all(10.0),
+              height: 50,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
@@ -200,32 +216,25 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.stacked_bar_chart),
-                    onPressed: () {},
-                  ),
+                  _buttonWrapping(
+                      icon: const Icon(Icons.stacked_bar_chart), onTap: () {}),
                   const SizedBox(),
-                  IconButton(
-                    icon: const Icon(Icons.account_circle_outlined),
-                    onPressed: () {
-                      final oldDailyLimit =
-                          drinksProvider.state.dailyWaterLimit;
-                      Navigator.pushNamed(context, profileScreenRoute,
-                              arguments: drinksProvider.state.drunkWater)
-                          .then((dailyLimit) {
-                        if (dailyLimit == null || dailyLimit == oldDailyLimit) {
-                          return;
-                        } else {
-                          drinksProvider.add(LoadDailyLimit());
-                        }
-                      });
-                      // MaterialPageRoute(
-                      //     builder: (_) => BlocProvider<DrinksBloc>.value(
-                      //           value: context.read<DrinksBloc>(),
-                      //           child: const ProfileScreenWrapper(),
-                      //         )));
-                    },
-                  ),
+                  _buttonWrapping(
+                      icon: const Icon(Icons.account_circle_outlined,),
+                      onTap: () {
+                        final oldDailyLimit =
+                            drinksProvider.state.dailyWaterLimit;
+                        Navigator.pushNamed(context, profileScreenRoute,
+                                arguments: drinksProvider.state.drunkWater)
+                            .then((dailyLimit) {
+                          if (dailyLimit == null ||
+                              dailyLimit == oldDailyLimit) {
+                            return;
+                          } else {
+                            drinksProvider.add(LoadDailyLimit());
+                          }
+                        });
+                      }),
                 ],
               ),
             ),
@@ -234,5 +243,19 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
     });
+  }
+
+  Widget _buttonWrapping({required Icon icon, required void Function() onTap}) {
+    return Material(
+      child: InkWell(
+        highlightColor: Colors.blueAccent.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(15),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: icon,
+        ),
+      ),
+    );
   }
 }

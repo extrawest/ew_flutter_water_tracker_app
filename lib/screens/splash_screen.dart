@@ -35,9 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             Text(
               'Water Tracker',
-              style: TextStyle(
-                  fontSize: 28,
-                  color: Theme.of(context).textTheme.bodyText1?.color),
+              style: Theme.of(context).textTheme.headline5,
             ),
             SizedBox(
               width: 100,

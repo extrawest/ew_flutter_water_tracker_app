@@ -7,6 +7,7 @@ import 'package:water_tracker/common/app_constants.dart';
 import 'package:water_tracker/repository/firestore_repository.dart';
 import 'package:water_tracker/repository/storage_repository.dart';
 import 'package:water_tracker/services/firebase/crashlytics_service.dart';
+import 'package:water_tracker/theme/decorations.dart';
 
 class ProfileScreenWrapper extends StatelessWidget {
   const ProfileScreenWrapper({Key? key}) : super(key: key);
@@ -40,16 +41,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final userProvider = context.read<UserProfileBloc>();
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Settings',
-          style: TextStyle(color: Colors.black45),
+          style: theme.textTheme.bodyText1,
         ),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit),
+            icon: Icon(Icons.edit, color: theme.primaryColor,),
             color: Colors.black45,
             onPressed: () {
               userProvider.add(CheckEdit(true));
@@ -58,8 +60,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
         leading: IconButton(
-          icon: const Icon(Icons.arrow_left_rounded),
-          color: Colors.black45,
+          icon: Icon(Icons.arrow_left_rounded, color: theme.primaryColor),
           onPressed: () {
             Navigator.pop(context,
                 context.read<UserProfileBloc>().state.user?.dailyWaterLimit);
@@ -111,10 +112,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   InputDecoration _formDecoration(String label) {
+    final theme = Theme.of(context);
     return InputDecoration(
+      labelStyle: theme.inputDecorationTheme.labelStyle,
       labelText: label,
-      border: const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.black12, width: 1)),
+      border: theme.inputDecorationTheme.border,
+      focusedBorder: theme.inputDecorationTheme.focusedBorder,
+      enabledBorder: theme.inputDecorationTheme.enabledBorder
     );
   }
 
@@ -139,10 +143,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: SizedBox(
               width: 140,
               child: TextButton(
+                style: textButtonStyle[1],
                 onPressed: () {
                   context.read<UserProfileBloc>().add(PickPhotoFromGallery());
                 },
-                child: const Text('Set new photo'),
+                child: Text('Set new photo', style: Theme.of(context).textTheme.button),
               ),
             ),
           ),
@@ -152,6 +157,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _form(BuildContext context, UserProfileState state) {
+    final theme = Theme.of(context);
     final sumOfMilliliters = ModalRoute.of(context)!.settings.arguments as int;
     return Form(
       key: _formKey,
@@ -161,27 +167,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
             margin: const EdgeInsets.only(bottom: 16.0),
             child: TextFormField(
               controller: _nameController,
-              style: TextStyle(
-                  color:
-                      state.isEdit ? const Color(0xff274a6d) : Colors.black38),
+              style: state.isEdit ? theme.textTheme.bodyText2 : theme.textTheme.subtitle2,
               enabled: state.isEdit,
               decoration: _formDecoration('Name'),
             ),
           ),
           TextFormField(
             controller: _dailyLimitController,
-            style: TextStyle(
-                color: state.isEdit ? const Color(0xff274a6d) : Colors.black38),
+            style: state.isEdit ? theme.textTheme.bodyText2 : theme.textTheme.subtitle2,
             enabled: state.isEdit,
             decoration: _formDecoration('Daily Water Limit'),
           ),
           Visibility(
             visible: !state.isEdit,
             child: TextButton(
+              style: textButtonStyle[1],
               onPressed: () {
                 context.read<DynamicLinkBloc>().add(ShareDynamicLink(sumOfMilliliters));
               },
-              child: const Text('Share my result'),
+              child: Text('Share my result', style: Theme.of(context).textTheme.button),
             ),
           ),
           Visibility(
@@ -189,17 +193,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Row(
                 children: [
                   TextButton(
+                    style: textButtonStyle[1],
                     onPressed: () {
                       context.read<UserProfileBloc>().add(SaveChanges(
                           _nameController.text, _dailyLimitController.text));
                     },
-                    child: const Text('Save changes'),
+                    child: Text('Save changes', style: Theme.of(context).textTheme.button),
                   ),
                   TextButton(
+                    style: textButtonStyle[1],
                     onPressed: () {
                       context.read<UserProfileBloc>().add(CheckEdit(false));
                     },
-                    child: const Text('Cancel'),
+                    child: Text('Cancel', style: Theme.of(context).textTheme.button),
                   ),
                 ],
               )),

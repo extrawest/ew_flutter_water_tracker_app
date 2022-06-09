@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:water_tracker/bloc/auth_bloc/auth_bloc_barrel.dart';
 import 'package:water_tracker/common/app_constants.dart';
 import 'package:water_tracker/routes.dart';
+import 'package:water_tracker/theme/decorations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -79,12 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
               onPressed: () {
                 _loginUser();
               },
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.all(20),
-                primary: Colors.white,
-                backgroundColor:
-                    const Color.fromRGBO(67, 91, 206, 0.9019607843137255),
-              ),
+              style: textButtonStyle[0],
               child: const Text('Login')),
         ),
         TextButton(
@@ -113,10 +109,12 @@ class _LoginScreenState extends State<LoginScreen> {
         decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(fontSize: 20.0, color: Colors.black12),
-            focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Color(0xff5aaed4), width: 2)),
-            enabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black12, width: 1)),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30.0),
+                borderSide: const BorderSide(color: Color(0xff5aaed4), width: 2)),
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30.0),
+                borderSide: const BorderSide(color: Colors.black12, width: 1)),
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 10.0, right: 10.0),
               child: IconTheme(

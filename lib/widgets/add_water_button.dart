@@ -11,8 +11,8 @@ class AddWaterButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: Alignment.center,
-      child: Container(
+        alignment: Alignment.center,
+        child: Container(
           height: 70,
           width: 70,
           decoration: BoxDecoration(
@@ -24,35 +24,35 @@ class AddWaterButton extends StatelessWidget {
                     blurRadius: 10,
                     offset: Offset(0, 5))
               ],
-              gradient: const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: <Color>[
-                  Color(0xff50b3fb),
-                  Color(0xff0082fa),
-                ],
-              )),
-          child: IconButton(
-              onPressed: () {
+          ),
+          child: Material(
+            color: Colors.blue,
+            borderRadius: BorderRadius.circular(20),
+            child: InkWell(
+              highlightColor: Colors.blueAccent.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(20),
+              onTap: () {
                 Navigator.push(
                     context,
                     PopupLayout(
-                        child: MultiBlocProvider(providers: [
-                          BlocProvider.value(
-                            value: context.read<DatePickerBloc>(),
-                          ),
-                          BlocProvider.value(
-                            value: context.read<DrinksBloc>(),
-                          )
-                        ], child: const AddWaterPopup()),
+                          child: MultiBlocProvider(providers: [
+                              BlocProvider.value(
+                                value: context.read<DatePickerBloc>(),
+                              ),
+                              BlocProvider.value(
+                                value: context.read<DrinksBloc>(),
+                              )
+                            ], child: const AddWaterPopup()),
                         top: 170,
                         bottom: 170));
               },
-              icon: const Icon(
+              child: const Icon(
                 Icons.add_rounded,
                 color: Colors.white,
                 size: 40,
-              ))),
-    );
+              ),
+            ),
+          ),
+        ));
   }
 }

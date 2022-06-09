@@ -4,6 +4,7 @@ import 'package:water_tracker/bloc/date_picker_bloc/date_picker_bloc_barrel.dart
 import 'package:water_tracker/bloc/drinks_bloc/drinks_bloc_barrel.dart';
 import 'package:water_tracker/bloc/home_cubit/home_cubit.dart';
 import 'package:water_tracker/models/water_model.dart';
+import 'package:water_tracker/theme/decorations.dart';
 import 'package:water_tracker/widgets/empty_drinks_list.dart';
 
 class DrinksList extends StatelessWidget {
@@ -11,6 +12,7 @@ class DrinksList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return BlocBuilder<DrinksBloc, DrinkState>(builder: (context, drinkState) {
       if(drinkState.status == DrinkStatus.loading){
         return const Center(child: CircularProgressIndicator(),);
@@ -26,7 +28,7 @@ class DrinksList extends StatelessWidget {
               padding: const EdgeInsets.all(14.0),
               child: ListView(shrinkWrap: true, children: [
                 ListTile(
-                  title: const Text("Today's drinks:"),
+                  title: Text("Today's drinks:", style: theme.textTheme.headline6,),
                   trailing: IconButton(
                       onPressed: () {}, icon: const Icon(Icons.info_outlined)),
                 ),
@@ -40,8 +42,8 @@ class DrinksList extends StatelessWidget {
                       },
                       key: UniqueKey(),
                       child: ListTile(
-                        title: Text(water.type),
-                        subtitle: Text(water.time),
+                        title: Text(water.type, style: Theme.of(context).textTheme.bodyText2),
+                        subtitle: Text(water.time, style: Theme.of(context).textTheme.subtitle1),
                         trailing: Text('${water.amount}ml'),
                       ),
                     ))
@@ -52,11 +54,8 @@ class DrinksList extends StatelessWidget {
             onPressed: () {
               context.read<HomeCubit>().setTab(HomeTab.progress);
             },
-            style: ButtonStyle(
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0))),
-            ),
-            child: const Text('Overall volume'),
+            style: textButtonStyle[1],
+            child: Text('Overall volume', style: Theme.of(context).textTheme.button,),
           ),
         ],
       );

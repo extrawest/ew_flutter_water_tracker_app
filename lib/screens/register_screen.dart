@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:water_tracker/bloc/auth_bloc/auth_bloc_barrel.dart';
+import 'package:water_tracker/theme/decorations.dart';
 import '../routes.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -90,12 +91,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 onPressed: () {
                   _submitForm();
                 },
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.all(20),
-                  primary: Colors.white,
-                  backgroundColor:
-                      const Color.fromRGBO(67, 91, 206, 0.9019607843137255),
-                ),
+                style: textButtonStyle[0],
                 child: const Text('Register')),
           ),
           TextButton(
