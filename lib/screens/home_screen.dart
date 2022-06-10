@@ -56,8 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     context.read<DynamicLinkBloc>().add(RequestSubscription());
     CloudMessagingService().subscribeTopic('reminders');
-    context
-        .read<CloudMessagingService>()
+    CloudMessagingService()
         .fcmInstance
         .getInitialMessage()
         .then((message) {

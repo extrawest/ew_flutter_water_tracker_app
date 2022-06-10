@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:water_tracker/models/user_model.dart';
 import 'package:water_tracker/models/water_model.dart';
 import 'package:water_tracker/services/firebase/cloud_messaging_service.dart';
-import 'package:water_tracker/services/firebase/firestore.dart';
+import 'package:water_tracker/services/firebase/firestore_service.dart';
 
 import '../services/firebase/analytics_service.dart';
 

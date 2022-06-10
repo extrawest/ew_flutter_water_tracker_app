@@ -13,7 +13,7 @@ import 'package:water_tracker/services/firebase/cloud_messaging_service.dart';
 import 'package:water_tracker/services/firebase/crashlytics_service.dart';
 import 'package:water_tracker/services/firebase/dynamic_links_service.dart';
 import 'package:water_tracker/services/firebase/firebase_authentication.dart';
-import 'package:water_tracker/services/firebase/firestore.dart';
+import 'package:water_tracker/services/firebase/firestore_service.dart';
 import 'package:water_tracker/services/firebase/storage_service.dart';
 import 'package:water_tracker/view_models/theme_view_model.dart';
 

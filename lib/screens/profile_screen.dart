@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:water_tracker/bloc/auth_bloc/auth_bloc_barrel.dart';
 import 'package:water_tracker/bloc/dynamic_link_bloc/dynamic_link_barrel.dart';
+import 'package:water_tracker/bloc/get_info_cubit/info_tap_cubit.dart';
 import 'package:water_tracker/bloc/user_profile_bloc/user_profile_barrel.dart';
 import 'package:water_tracker/common/app_constants.dart';
+import 'package:water_tracker/popup/info_popup.dart';
+import 'package:water_tracker/popup/popup_layout.dart';
 import 'package:water_tracker/repository/firestore_repository.dart';
 import 'package:water_tracker/repository/storage_repository.dart';
 import 'package:water_tracker/services/firebase/crashlytics_service.dart';
@@ -37,6 +40,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _nameController = TextEditingController();
   final _dailyLimitController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  final _tapCubit = InfoTapCubit();
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +59,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             color: Colors.black45,
             onPressed: () {
               userProvider.add(CheckEdit(true));
+              _tapCubit.tapIncrement();
+              if(_tapCubit.state == 10){
+                _showInfo(context);
+                _tapCubit.tapClear();
+              }
             },
             splashRadius: 15,
           ),
@@ -195,6 +204,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   TextButton(
                     style: textButtonStyle[1],
                     onPressed: () {
+                      _tapCubit.tapClear();
                       context.read<UserProfileBloc>().add(SaveChanges(
                           _nameController.text, _dailyLimitController.text));
                     },
@@ -203,6 +213,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   TextButton(
                     style: textButtonStyle[1],
                     onPressed: () {
+                      _tapCubit.tapClear();
                       context.read<UserProfileBloc>().add(CheckEdit(false));
                     },
                     child: Text('Cancel', style: Theme.of(context).textTheme.button),
@@ -233,5 +244,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             )),
       ),
     );
+  }
+
+  void _showInfo(BuildContext context) {
+    Navigator.push(
+        context,
+        PopupLayout(
+            child: const InfoPopup(),
+            top: 150,
+            bottom: 150));
   }
 }
