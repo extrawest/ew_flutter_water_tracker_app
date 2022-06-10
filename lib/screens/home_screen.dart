@@ -32,8 +32,8 @@ class HomeScreenWrapper extends StatelessWidget {
         BlocProvider<DrinksBloc>(
           create: (context) => DrinksBloc(
             repository: context.read<FirestoreRepositoryImpl>(),
-            crashlyticsService: context.read<CrashlyticsService>(),
-            remoteConfigService: context.read<RemoteConfigService>(),
+            crashlyticsService: CrashlyticsService(),
+            remoteConfigService: RemoteConfigService(),
           )
             ..add(LoadDailyLimit())
             ..add(FetchIndicatorType()),
@@ -55,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     context.read<DynamicLinkBloc>().add(RequestSubscription());
-    context.read<CloudMessagingService>().subscribeTopic('reminders');
+    CloudMessagingService().subscribeTopic('reminders');
     context
         .read<CloudMessagingService>()
         .fcmInstance

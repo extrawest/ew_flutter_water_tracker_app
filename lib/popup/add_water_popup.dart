@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:water_tracker/bloc/date_picker_bloc/date_picker_bloc.dart';
 import 'package:water_tracker/bloc/drinks_bloc/drinks_bloc.dart';
 import 'package:water_tracker/bloc/drinks_bloc/drinks_event.dart';
+import 'package:water_tracker/theme/decorations.dart';
 
 class AddWaterPopup extends StatefulWidget {
   const AddWaterPopup({Key? key}) : super(key: key);
@@ -44,7 +45,8 @@ class _AddWaterPopupState extends State<AddWaterPopup> {
             children: [
               const Text('Select time'),
               TextButton(
-                child: Text(_selectedTime),
+                style: textButtonStyle[1],
+                child: Text(_selectedTime, style: Theme.of(context).textTheme.button),
                 onPressed: () async {
                   final result = await showTimePicker(
                       context: context,
@@ -77,6 +79,7 @@ class _AddWaterPopupState extends State<AddWaterPopup> {
               return null;
             },
           ),
+          const SizedBox(height: 10,),
           TextFormField(
             controller: _amountController,
             decoration: const InputDecoration(
@@ -103,7 +106,7 @@ class _AddWaterPopupState extends State<AddWaterPopup> {
       child: Row(
         children: [
           TextButton(
-            child: const Text('Add'),
+            child: Text('Add', style: Theme.of(context).textTheme.button),
             onPressed: () {
               if (_formKey.currentState!.validate()) {
                 _addDrink();
@@ -112,7 +115,7 @@ class _AddWaterPopupState extends State<AddWaterPopup> {
             },
           ),
           TextButton(
-            child: const Text('Cancel'),
+            child: Text('Cancel', style: Theme.of(context).textTheme.button),
             onPressed: () {
               Navigator.pop(context);
             },

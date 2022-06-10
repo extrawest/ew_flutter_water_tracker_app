@@ -47,7 +47,6 @@ ThemeData lightTheme = ThemeData(
     headline3: TextStyle(fontSize: 40.0, fontWeight: FontWeight.bold, color: Color(0xffbfd3e2)),
     headline5: TextStyle(fontSize: 22.0, color: darkBlue, fontWeight: FontWeight.bold),
     headline6: TextStyle(fontSize: 18.0, color: darkBlue, fontWeight: FontWeight.bold),
-    //bodyText1: TextStyle(color: Color(0xff92b0d0), fontWeight: FontWeight.bold),
     bodyText1: TextStyle(fontSize: 14.0, color: darkBlue, fontWeight: FontWeight.bold),
     bodyText2: TextStyle(fontSize: 16.0, color: darkBlue, fontWeight: FontWeight.w500),
     subtitle1: TextStyle(fontSize: 14.0, color: Color(0xffbfd3e2)),

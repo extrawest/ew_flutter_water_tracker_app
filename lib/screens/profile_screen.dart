@@ -18,7 +18,7 @@ class ProfileScreenWrapper extends StatelessWidget {
       create: (context) => UserProfileBloc(
           firestoreRepository: context.read<FirestoreRepositoryImpl>(),
           storageRepository: context.read<StorageRepositoryImpl>(),
-          crashlyticsService: context.read<CrashlyticsService>())
+          crashlyticsService: CrashlyticsService())
         ..add(LoadUserProfile())
         ..add(LoadUserPhoto()),
       child: const ProfileScreen(),
