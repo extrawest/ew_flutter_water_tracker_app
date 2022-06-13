@@ -8,7 +8,7 @@ class UserModel {
   UserModel(
       {this.id,
       required this.email,
-       required this.name,
+      required this.name,
       this.photoId,
       required this.dailyWaterLimit});
 
@@ -23,8 +23,14 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-        email: json['email'],
-        name: json['name'] ?? '',
-        dailyWaterLimit: json['daily_water_limit'],);
+      email: json['email'],
+      name: json['name'] ?? '',
+      dailyWaterLimit: json['daily_water_limit'],
+    );
+  }
+
+  @override
+  String toString() {
+    return 'id: $id, name: $name, email: $email, photoId: $photoId, dailyWaterLimit: $dailyWaterLimit';
   }
 }

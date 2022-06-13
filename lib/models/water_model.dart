@@ -18,4 +18,9 @@ class WaterModel {
     return WaterModel(
         amount: json['amount'], time: json['time'], type: json['type']);
   }
+
+  @override
+  String toString() {
+    return 'amount: $amount, type: $type, time: $time';
+  }
 }
