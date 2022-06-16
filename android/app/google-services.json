@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "803272888282",
+    "project_id": "water-tracker-app-8936c",
+    "storage_bucket": "water-tracker-app-8936c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:803272888282:android:a4915cf3797894e6cabae3",
+        "android_client_info": {
+          "package_name": "com.extrawest.water_tracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "803272888282-tqjknrfksojm85unggjr16ocj88aje36.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCq3X5BDG-KLr8Eic74dkznY2Tg3Gxjh1E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "803272888282-tqjknrfksojm85unggjr16ocj88aje36.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

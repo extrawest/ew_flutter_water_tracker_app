@@ -16,7 +16,7 @@ class PopupLayout extends ModalRoute {
   bool get opaque => false;
 
   @override
-  bool get barrierDismissible => false;
+  bool get barrierDismissible => true;
 
   @override
   Color get barrierColor => bgColor ?? Colors.black.withOpacity(0.5);
