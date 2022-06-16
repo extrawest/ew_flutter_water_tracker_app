@@ -25,7 +25,6 @@ final configuredApp = AppConfig(
 
 
 #### DEVELOPMENT
-
 Follow the same process, but fill the empty fields with the development values
 dart
 final configuredApp = AppConfig(
