@@ -14,6 +14,12 @@
 * Codemagic is used to make production builds
 <br><br>
 
+#### DEMO
+
+
+https://user-images.githubusercontent.com/117409513/218480278-65053377-f4ff-41a3-b658-12db384ff1a7.mp4
+
+
 #### PRODUCTION
 
 In main_prod.dart set <b>AppConfig()</b> with
