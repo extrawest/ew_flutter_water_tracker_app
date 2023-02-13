@@ -1,10 +1,10 @@
 <h1>Water Tracker Flutter App</h1>
 
-By Ovsepian Roman
+https://gitlab.extrawest.com/roman.ovsepian/water-tracker.git
 
 <h2>Project Info</h2>
 
-* Water Tracker works with Flutter v3.0.2
+* Water Tracker works with Flutter latest version
 * Water Tracker is integrated with firebase services(authentication, firestore, storage, analytics, crashlytics, dynamic links, remote config, cloud messaging)
 * App is built with BloC state managment
 * Codemagic is used to make production builds
@@ -50,6 +50,25 @@ or make pull request to master branch on your remote repository.
 GitLab repository and Codemagic have triggers on this events, so the build will start.
 
 
+### Installing:
+
+**1. Clone this repo to your folder:**
+
+```
+git clone https://gitlab.extrawest.com/roman.ovsepian/water-tracker.git
+```
+
+**2. Change current directory to the cloned folder:**
+
+```
+cd triple_seven_slots_game
+```
+
+**3. Get packages**
+
+```
+flutter pub get
+```
 
 ## Firebase Distribution
 
@@ -145,3 +164,9 @@ Remote config is used for changing the progress indicator of drunk water during 
 ### <i>Firebase Dynamic Links</i>
 
 Dynamic links gives each user ability to share his daily progress with others. User can just copy the link or share it to other social media with the share_plus package(https://pub.dev/packages/share_plus)
+
+Created by Roman Ovsepian
+
+[Extrawest.com](https://www.extrawest.com), 2022
+
+---
