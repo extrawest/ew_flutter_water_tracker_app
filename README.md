@@ -65,13 +65,13 @@ GitLab repository and Codemagic have triggers on this events, so the build will 
 **1. Clone this repo to your folder:**
 
 ```
-git clone https://gitlab.extrawest.com/roman.ovsepian/water-tracker.git
+git clone https://github.com/extrawest/ew_flutter_water_tracker_app.git
 ```
 
 **2. Change current directory to the cloned folder:**
 
 ```
-cd triple_seven_slots_game
+cd ew_flutter_water_tracker_app
 ```
 
 **3. Get packages**
